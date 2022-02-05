@@ -17,6 +17,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "engine.hpp"
 #include "engine_cog.hpp"
 #include <cassert>
+#include "engine_ticker.hpp"
 
 namespace RAOE
 {
@@ -32,8 +33,13 @@ namespace RAOE
         {
             engine_cog->engine_ptr = std::make_unique<Engine>();
             //TODO: Forward the command line args
-
             CogManager::Get().activate_cog<EngineCog>();
+
+            //Activate all the other cogs
+            for(const auto& [module_name, module_ptr] : CogManager::Get().registry)
+            {
+                CogManager::Get().activate_cog(module_ptr);
+            }
             
             return *engine_cog->engine_ptr.get();
         }
@@ -43,6 +49,31 @@ namespace RAOE
         __assume(0);
     }
 
+    bool Engine::Run()    
+    {
+        if(std::shared_ptr<RAOE::_::Ticker> ticker_cog = CogManager::Get().get_cog<RAOE::_::Ticker>().lock())
+        {   
+            ticker_cog->run_tick();
+        }
+      
+        return !exit_requested;
+    }
+
+    void Engine::Shutdown()    
+    {
+        auto engine_cog = CogManager::Get().get_cog<EngineCog>().lock();
+
+        for(const auto& [cog_name, cog_ptr] : CogManager::Get().registry)
+        {
+            if(cog_ptr != engine_cog)
+            {
+                CogManager::Get().shutdown_cog(cog_ptr, true);
+            }
+        }
+
+        //Shutdown the engine last
+        CogManager::Get().shutdown_cog(engine_cog);
+    }
 
 
 }

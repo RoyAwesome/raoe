@@ -29,23 +29,17 @@ namespace RAOE
     protected:
         //Main calls Init and Run (but nobody else can).  So it's friend.  
         friend int ::main(int, char**);
+        friend class CogManager;
 
         static Engine& Init(int32 argc, char* argv[]);
         bool Run();
         void Shutdown();
-
-
     public:
       
-        void register_tickfunc(std::function<void()> tickfunc);
         void request_exit() { exit_requested = true; }
-
         bool should_exit() const { return exit_requested; }
-    
-  
 
     private:
-        std::vector<std::function<void()>> tick_funcs;
         bool exit_requested = false;
     };
 
@@ -61,6 +55,6 @@ namespace RAOE
             virtual void deactivated() override {}
 
             std::unique_ptr<RAOE::Engine> engine_ptr;
-        };
+        };       
     }
 }

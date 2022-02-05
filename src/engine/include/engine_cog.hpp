@@ -31,15 +31,19 @@ namespace RAOE
         ACTIVATED,
         PRESHUTDOWN,
         SHUTDOWN,
+        SHUTDOWN_ENGINE,
     };
 
-    class IEngineCog
+    class IEngineCog : public std::enable_shared_from_this<IEngineCog>
     {
     public:
         virtual void activated() = 0;
         virtual void deactivated() = 0;
 
-        ECogStatus status = ECogStatus::CREATED;
+        ECogStatus status = ECogStatus::CREATED;   
+        std::string name;
+
+        void register_tickfunc(std::function<void()>&& tickfunc);   
     };
 
     class CogManager
@@ -70,13 +74,17 @@ namespace RAOE
         {
             activate_cog(Voidcraft::Core::NameOf<T>());
         } 
-
-    private:
-        void register_cog(std::string_view name, std::shared_ptr<IEngineCog>&& module);
+        
         //Returns a cog (or null if the cog doesn't exist) 
         std::weak_ptr<IEngineCog> get_cog(std::string_view module_name) const;
+    private:
+        void register_cog(std::string_view name, std::shared_ptr<IEngineCog>&& module);
+       
 
         void activate_cog(std::string_view name) const;
+        void activate_cog(std::weak_ptr<IEngineCog> cog) const;
+
+        void shutdown_cog(std::weak_ptr<IEngineCog> cog, bool engine_shutdown = false) const;
  
         RegistryType registry;
     };
