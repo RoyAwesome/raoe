@@ -21,7 +21,7 @@ namespace flecs
     class world;
 }
 
-namespace OTSR::ECS::SDL
+namespace RAOE::ECS::SDL
 {
     struct Module
     {

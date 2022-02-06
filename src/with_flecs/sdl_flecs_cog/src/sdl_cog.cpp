@@ -14,23 +14,24 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
-
 #include "engine_cog.hpp"
+#include "flecs_cog.hpp"
+#include "sdl_module.hpp"
 
 namespace RAOE::Cogs
 {
-    inline namespace _
-    {
-        struct Ticker : public RAOE::IEngineCog
-        {
-            using Registry = std::unordered_map<std::string, std::function<void()>>;
-            virtual void activated() override {}
-            virtual void deactivated() override {}
-            
-            void run_tick();
+    using IEngineCog = RAOE::IEngineCog;
 
-            Registry tick_funcs;
-        };
-    }
+    struct SDLFLECSCog : public IEngineCog
+    {
+        virtual void activated()
+        {
+            if(auto flecs_cog = CogManager::Get().get_cog<RAOE::Cogs::FlecsCog>().lock())
+            {
+                flecs_cog->ecs_world_client->import<RAOE::ECS::SDL::Module>();
+            }
+        }
+    };
+
+    REGISTER_COG(SDLFLECSCog)
 }

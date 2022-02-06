@@ -39,6 +39,8 @@ namespace RAOE
     {
         cog->name = std::string(name);
         registry.emplace(std::string(name), cog);
+
+        spdlog::info("Cog {} - Status: {}", name, cog->status);
     }
 
     void CogManager::activate_cog(std::string_view name) const
@@ -60,6 +62,8 @@ namespace RAOE
             cog_ptr->status = ECogStatus::PREACTIVATE;
             cog_ptr->activated();
             cog_ptr->status = ECogStatus::ACTIVATED;
+
+            spdlog::info("Cog {} - Status: {}", cog_ptr->name, cog_ptr->status);
         }
     }
 
@@ -70,12 +74,13 @@ namespace RAOE
             cog_ptr->status = ECogStatus::PRESHUTDOWN;
             cog_ptr->deactivated();
             cog_ptr->status = engine_shutdown ? ECogStatus::SHUTDOWN_ENGINE : ECogStatus::SHUTDOWN;
+            spdlog::info("Cog {} - Status: {}", cog_ptr->name, cog_ptr->status);
         }    
     }
 
     void IEngineCog::register_tickfunc(std::function<void()>&& tickfunc)    
     {
-        if(auto ticker_ptr = CogManager::Get().get_cog<RAOE::_::Ticker>().lock())
+        if(auto ticker_ptr = CogManager::Get().get_cog<RAOE::Cogs::_::Ticker>().lock())
         {
             ticker_ptr->tick_funcs.emplace(name, std::move(tickfunc));
         }

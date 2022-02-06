@@ -75,11 +75,11 @@ int main(int argc, char* argv[])
     InitFLECSSystem();
 
     std::unique_ptr<flecs::world> world = std::make_unique<flecs::world>(argc, argv);
-    world->import<OTSR::ECS::App::Module>();
-    world->import<OTSR::ECS::SDL::Module>();
-    world->import<OTSR::ECS::Imgui::Module>();
+    world->import<RAOE::ECS::App::Module>();
+    world->import<RAOE::ECS::SDL::Module>();
+    world->import<RAOE::ECS::Imgui::Module>();
 
-    world->entity().set<OTSR::ECS::App::Canvas>({"Open Tiberium Sun", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
+    world->entity().set<RAOE::ECS::App::Canvas>({"Open Tiberium Sun", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
 
     while(world->progress()) { }
 

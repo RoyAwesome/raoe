@@ -20,14 +20,4 @@ if(NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
 endif()
 include(${CPM_DOWNLOAD_LOCATION})
 
-
-CPMAddPackage("gh:g-truc/glm#master")
-CPMAddPackage("gh:gabime/spdlog#v1.9.2")
-CPMAddPackage("gh:RoyAwesome/vccore#main")
-
-CPMAddPackage(
-  GITHUB_REPOSITORY jarro2783/cxxopts
-  GIT_TAG "tags/v3.0.0"
-  OPTIONS "CXXOPTS_BUILD_EXAMPLES NO" "CXXOPTS_BUILD_TESTS NO" "CXXOPTS_ENABLE_INSTALL YES"
-)
-
+CPMAddPackage("gh:SanderMertens/flecs#master")

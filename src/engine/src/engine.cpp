@@ -37,8 +37,11 @@ namespace RAOE
 
             //Activate all the other cogs
             for(const auto& [module_name, module_ptr] : CogManager::Get().registry)
-            {
-                CogManager::Get().activate_cog(module_ptr);
+            {               
+                if(module_ptr != engine_cog)
+                {
+                    CogManager::Get().activate_cog(module_ptr);
+                }                
             }
             
             return *engine_cog->engine_ptr.get();
@@ -51,7 +54,7 @@ namespace RAOE
 
     bool Engine::Run()    
     {
-        if(std::shared_ptr<RAOE::_::Ticker> ticker_cog = CogManager::Get().get_cog<RAOE::_::Ticker>().lock())
+        if(std::shared_ptr<RAOE::Cogs::_::Ticker> ticker_cog = CogManager::Get().get_cog<RAOE::Cogs::_::Ticker>().lock())
         {   
             ticker_cog->run_tick();
         }
@@ -61,6 +64,7 @@ namespace RAOE
 
     void Engine::Shutdown()    
     {
+        spdlog::info("Shutting down cogs for clean shutdown");
         auto engine_cog = CogManager::Get().get_cog<EngineCog>().lock();
 
         for(const auto& [cog_name, cog_ptr] : CogManager::Get().registry)
@@ -72,7 +76,7 @@ namespace RAOE
         }
 
         //Shutdown the engine last
-        CogManager::Get().shutdown_cog(engine_cog);
+        CogManager::Get().shutdown_cog(engine_cog, true);
     }
 
 

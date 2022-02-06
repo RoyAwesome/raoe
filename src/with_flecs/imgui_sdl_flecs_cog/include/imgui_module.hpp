@@ -21,7 +21,7 @@ namespace flecs
     class world;
 }
 
-namespace OTSR::ECS::Imgui
+namespace RAOE::ECS::Imgui
 {
     struct Module
     {

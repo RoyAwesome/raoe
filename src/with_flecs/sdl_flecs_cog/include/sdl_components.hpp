@@ -18,7 +18,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "sdl_helper.hpp"
 #include <vector>
 
-namespace OTSR::SDL
+namespace RAOE::SDL
 {    
     struct System
     {

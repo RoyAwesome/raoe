@@ -16,16 +16,59 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "flecs_cog.hpp"
 #include "engine.hpp"
+#include "client_app_module.hpp"
 
 namespace RAOE::Cogs
 {
+
+    void LogECS(int32 level,  const char *file,  int32 line, const char *msg)
+    {
+        spdlog::level::level_enum lvl = spdlog::level::trace;
+        if(level > 0)
+        {
+            lvl = spdlog::level::debug;
+        }
+        else if(level == -2)
+        {
+            lvl = spdlog::level::warn;
+        }
+        else if(level == -3)
+        {
+            lvl = spdlog::level::err;
+        }
+        else if(level == -4)
+        {
+            lvl = spdlog::level::critical;
+        }
+
+        std::string indentation = "";
+        for(int32 i  = 0; i < ecs_os_api.log_indent_; i++)
+        {
+            indentation += "\t -";
+        }
+
+        spdlog::log(lvl, "|{} ({}:{}) {} ", indentation, file, line, msg);
+    }
+
+    void InitFLECSSystem()
+    {
+        ecs_os_set_api_defaults();
+        ecs_os_api_t api = ecs_os_api;
+    
+        api.log_ = LogECS;
+        api.log_with_color_ = true;
+        ecs_os_set_api(&api);
+
+        ecs_log_set_level(0);
+        spdlog::set_level(spdlog::level::trace);
+    }
+
 
     FlecsCog::FlecsCog()   
         : IEngineCog() 
         , ecs_world_client(std::make_unique<flecs::world>())
     {
-        
-    
+        InitFLECSSystem();    
     }
 
     void FlecsCog::activated()    
@@ -41,12 +84,19 @@ namespace RAOE::Cogs
                     }                   
                 }
             }
-        });      
+        });  
+
+        if(ecs_world_client)
+        {
+            ecs_world_client->import<RAOE::ECS::ClientApp::Module>();
+        }    
     }
 
     void FlecsCog::deactivated()    
     {
     
     }
+
+    REGISTER_COG(FlecsCog)
 
 }

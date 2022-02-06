@@ -24,10 +24,10 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "imcmd_command_palette.h"
 
-namespace OTSR::ECS::Imgui
+namespace RAOE::ECS::Imgui
 {
-    using SDLSystem = OTSR::SDL::System;
-    using Events = OTSR::SDL::Events;
+    using SDLSystem = RAOE::SDL::System;
+    using Events = RAOE::SDL::Events;
    
     struct ImCmdInfo
     {

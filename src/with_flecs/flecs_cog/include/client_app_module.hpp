@@ -16,21 +16,23 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "engine_cog.hpp"
+#include <string>
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+#include "flecs.h"
 
-namespace RAOE::Cogs
+namespace RAOE::ECS::ClientApp
 {
-    inline namespace _
+    struct Canvas
     {
-        struct Ticker : public RAOE::IEngineCog
-        {
-            using Registry = std::unordered_map<std::string, std::function<void()>>;
-            virtual void activated() override {}
-            virtual void deactivated() override {}
-            
-            void run_tick();
+        std::string title;
+        glm::ivec2 window_size;
+        glm::i8vec4 clear_color;
+    };
 
-            Registry tick_funcs;
-        };
-    }
+    struct Module
+    {
+        Module(flecs::world& world);
+    };
+
 }

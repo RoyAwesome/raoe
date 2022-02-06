@@ -31,7 +31,7 @@ namespace flecs
     class world;
 }
 
-namespace OTSR::ECS::App
+namespace RAOE::ECS::App
 {
     struct Canvas
     {

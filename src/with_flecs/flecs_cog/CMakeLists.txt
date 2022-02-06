@@ -5,9 +5,12 @@ VERSION 1.0.0
 LANGUAGES CXX
 )
 
+add_subdirectory("third_party")
+
 add_library(${PROJECT_NAME}
     STATIC
     "src/flecs_cog.cpp"
+    "src/client_app_module.cpp"
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
@@ -19,10 +22,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC
-    glm
-    spdlog
-    vc::core
+    PUBLIC    
     raoe::engine
     flecs::flecs_static
 )

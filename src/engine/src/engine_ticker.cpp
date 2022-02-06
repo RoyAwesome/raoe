@@ -16,14 +16,22 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "engine_ticker.hpp"
 #include "engine_cog.hpp"
+#include "engine.hpp"
 
-namespace RAOE::_
+namespace RAOE::Cogs::_
 {
 
     void Ticker::run_tick()    
     {
         if(status != ECogStatus::ACTIVATED)
         {
+            return;
+        }
+
+        if(tick_funcs.size() == 0)
+        {
+            spdlog::warn("TICKER: No tick actions registered.  Exiting the engine");
+            CogManager::Get().get_cog<RAOE::Cogs::Engine>().lock()->engine_ptr->request_exit();
             return;
         }
 

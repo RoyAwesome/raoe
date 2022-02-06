@@ -38,7 +38,7 @@ namespace RAOE
     {
     public:
         virtual void activated() = 0;
-        virtual void deactivated() = 0;
+        virtual void deactivated() {}
 
         ECogStatus status = ECogStatus::CREATED;   
         std::string name;

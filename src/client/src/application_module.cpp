@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "application_module.hpp"
 #include "flecs.h"
 
-namespace OTSR::ECS::App
+namespace RAOE::ECS::App
 {
 
     Module::Module(flecs::world& world)    

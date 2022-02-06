@@ -16,15 +16,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "sdl_module.hpp"
 #include "sdl_components.hpp"
-#include "application_module.hpp"
+#include "client_app_module.hpp"
 
 #include "flecs.h"
 
-namespace OTSR::ECS::SDL
+namespace RAOE::ECS::SDL
 {
-    using System = OTSR::SDL::System;
-    using Events = OTSR::SDL::Events;
-    using Canvas = OTSR::ECS::App::Canvas;
+    using System = RAOE::SDL::System;
+    using Events = RAOE::SDL::Events;
+    using Canvas = RAOE::ECS::ClientApp::Canvas;
 
     void PollWindow(flecs::entity e, Events& events)
     {

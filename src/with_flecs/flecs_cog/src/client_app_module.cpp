@@ -13,24 +13,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include "client_app_module.hpp"
+#include "flecs.h"
 
-#pragma once
-
-#include "engine_cog.hpp"
-
-namespace RAOE::Cogs
+namespace RAOE::ECS::ClientApp
 {
-    inline namespace _
-    {
-        struct Ticker : public RAOE::IEngineCog
-        {
-            using Registry = std::unordered_map<std::string, std::function<void()>>;
-            virtual void activated() override {}
-            virtual void deactivated() override {}
-            
-            void run_tick();
 
-            Registry tick_funcs;
-        };
+    Module::Module(flecs::world& world)    
+    {
+        world.component<Canvas>();    
     }
+
 }
