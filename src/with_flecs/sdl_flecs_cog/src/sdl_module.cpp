@@ -95,13 +95,6 @@ namespace RAOE::ECS::SDL
                 e.add<Events>();
 
             });
-
-        /*
-        world.system<NT::Shared::Transform, NT::Shared::Circle>()
-            .kind(flecs::OnStore)
-            .each(&DrawCircle);
-        */
-          
     }
 
 }
