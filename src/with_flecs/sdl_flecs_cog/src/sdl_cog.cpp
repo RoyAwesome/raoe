@@ -33,5 +33,5 @@ namespace RAOE::Cogs
         }
     };
 
-    REGISTER_COG(SDLFLECSCog)
+    REGISTER_COG(sdl_flecs_cog, SDLFLECSCog)
 }

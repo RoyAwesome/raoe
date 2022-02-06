@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     world->import<RAOE::ECS::SDL::Module>();
     world->import<RAOE::ECS::Imgui::Module>();
 
-    world->entity().set<RAOE::ECS::App::Canvas>({"Open Tiberium Sun", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
+    world->entity()
 
     while(world->progress()) { }
 

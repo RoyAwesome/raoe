@@ -16,11 +16,40 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "engine.hpp"
 
+#include "engine_cog.hpp"
+#include "flecs_cog.hpp"
+#include "client_app_module.hpp"
+
+#ifndef RAOE_STATIC_COGS
+#define RAOE_STATIC_COGS 1 //TODO: get cmake to produce this.  this should be default 0
+#endif
+
+#if RAOE_STATIC_COGS
+#include "static_cogs.inl"
+#endif
+
 int main(int argc, char* argv[])
 {
+#if RAOE_STATIC_COGS
+    RAOE::_GENERATED::LoadStaticCogs();
+#endif
+
     RAOE::Engine& engine = RAOE::Engine::Init(argc, argv);
+
+   // RAOE::Cogs::Test();
+
+    //HACKHACK - Make a window here (TODO: Find a better place to do this)
+    if(auto flecs_cog = RAOE::CogManager::Get().get_cog<RAOE::Cogs::FlecsCog>().lock() )
+    {
+        flecs_cog->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
+    }
+    else
+    {
+        spdlog::warn("Unable to find flecs cog");
+    }
+
     while(engine.Run()) {}
     engine.Shutdown();
-    
+
     return 0;
 }

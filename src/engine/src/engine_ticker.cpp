@@ -48,6 +48,6 @@ namespace RAOE::Cogs::_
     
     }
 
-    REGISTER_COG(Ticker)
+    REGISTER_COG(Ticker, Ticker)
 
 }

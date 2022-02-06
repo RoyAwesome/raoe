@@ -19,11 +19,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE
 {
+    static std::optional<CogManager>& cog_manager_singleton()
+    {
+        static std::optional<CogManager> singleton(std::in_place);
+        return singleton;
+    }
 
     CogManager& CogManager::Get()    
     {
-        static CogManager mm;
-        return mm;
+        return cog_manager_singleton().value();
     }
 
     std::weak_ptr<IEngineCog> CogManager::get_cog(std::string_view cog_name) const    
@@ -73,10 +77,16 @@ namespace RAOE
         {
             cog_ptr->status = ECogStatus::PRESHUTDOWN;
             cog_ptr->deactivated();
+     
             cog_ptr->status = engine_shutdown ? ECogStatus::SHUTDOWN_ENGINE : ECogStatus::SHUTDOWN;
             spdlog::info("Cog {} - Status: {}", cog_ptr->name, cog_ptr->status);
         }    
     }
+
+    void CogManager::register_static_linked_cog(std::string_view cog_definition, std::string_view cog_classname, CogCtorFunc&& cog_func)
+    {   
+        pending_static_linked_cogs.emplace(std::string(cog_definition), PendingStaticLinkedCog { std::string(cog_classname), cog_func });
+    }  
 
     void IEngineCog::register_tickfunc(std::function<void()>&& tickfunc)    
     {

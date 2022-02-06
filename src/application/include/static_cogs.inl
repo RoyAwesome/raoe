@@ -14,23 +14,21 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
+
+/*
+    GENERATED FILE
+
+    DO NOT EDIT
+*/
+
 #include "engine_cog.hpp"
 
-#include "flecs.h"
-
-namespace RAOE::Cogs
+namespace RAOE::_GENERATED
 {
-    struct FlecsCog : public IEngineCog
+    extern "C" void __GENERATED__flecs_cog(); 
+
+    extern "C" void LoadStaticCogs()
     {
-        FlecsCog();
-      
-        virtual void activated() override;
-        virtual void deactivated() override;
-
-        std::unique_ptr<flecs::world> ecs_world_client;
-        //std::unique_ptr<flecs::world> ecs_world_server; //TODO: Server World
-    };
-
-    void Test();
+        __GENERATED__flecs_cog();
+    }
 }

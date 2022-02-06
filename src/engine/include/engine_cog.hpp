@@ -51,6 +51,9 @@ namespace RAOE
     public:
         using RegistryType = std::unordered_map<std::string, std::shared_ptr<IEngineCog>>;
         friend class Engine;
+        template<class T>
+            requires std::derived_from<T, IEngineCog>
+        friend class StaticLinkedCogFactory;
 
         static CogManager& Get();
 
@@ -85,19 +88,46 @@ namespace RAOE
         void activate_cog(std::weak_ptr<IEngineCog> cog) const;
 
         void shutdown_cog(std::weak_ptr<IEngineCog> cog, bool engine_shutdown = false) const;
+
+       
  
         RegistryType registry;
+
+        using CogCtorFunc = std::function<std::shared_ptr<IEngineCog>()>;
+        struct PendingStaticLinkedCog
+        {
+            std::string class_name;
+            CogCtorFunc factory;
+        };
+
+        void register_static_linked_cog(std::string_view cog_definition, std::string_view cog_classname, CogCtorFunc&& cog_func);
+        std::unordered_map<std::string, PendingStaticLinkedCog> pending_static_linked_cogs;
     };
 
-    #define REGISTER_COG(clazz)                                         \
-    namespace zzz_RegisterCog__ ## clazz ## __internal {                \
-        struct zzz_RegisterCog__ ## clazz                               \
-        {                                                               \
-            zzz_RegisterCog__ ## clazz()                                \
-            {                                                           \
-                RAOE::CogManager::Get().register_cog<clazz>();          \
-            }                                                           \
-        };                                                              \
-        static zzz_RegisterCog__ ## clazz zzz_registered__ ## clazz;    \
-    }
+    template<class T>
+        requires std::derived_from<T, IEngineCog>
+    struct StaticLinkedCogFactory
+    {
+        using CogType = T;
+
+        StaticLinkedCogFactory(std::string_view cog_name)
+        {
+            CogManager::Get().register_static_linked_cog(
+                cog_name, 
+                Voidcraft::Core::NameOf<CogType>(), 
+                [](){ return std::make_shared<CogType>(); }
+            );      
+        }   
+
+        int touch()
+        {
+            return 0;
+        }     
+    };
+
+    #define REGISTER_COG(cog_name, clazz)                                                                       \
+    namespace zzz_RegisterCog__ ## cog_name ## __internal {                                                     \
+        static RAOE::StaticLinkedCogFactory<clazz> zzz_registered__##clazz(#cog_name);                          \
+    }                                                                                                           \
+    extern "C" void __GENERATED__##cog_name() { zzz_RegisterCog__ ## cog_name ## __internal::zzz_registered__##clazz.touch(); }
 }

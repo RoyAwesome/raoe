@@ -22,18 +22,27 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 namespace RAOE
 {
     using EngineCog = RAOE::Cogs::Engine;
-    REGISTER_COG(EngineCog)
 
 
     Engine& Engine::Init(int32 argc, char* argv[])
     {
         spdlog::info("Initializing Roy Awesome's Open Engine (RAOE)");
 
+        //The engine cog is a special cog, and is not registered normally.  This is where we register it and activate it
+        CogManager::Get().register_cog(Voidcraft::Core::NameOf<EngineCog>(), std::make_shared<EngineCog>());
+
         if(std::shared_ptr<EngineCog> engine_cog = CogManager::Get().get_cog<EngineCog>().lock())
         {
             engine_cog->engine_ptr = std::make_unique<Engine>();
             //TODO: Forward the command line args
             CogManager::Get().activate_cog<EngineCog>();
+
+            //Load the statically linked cogs
+            for(const auto& [module_name, cog_struct] : CogManager::Get().pending_static_linked_cogs)
+            {
+                CogManager::Get().register_cog(cog_struct.class_name, cog_struct.factory());
+            }
+            CogManager::Get().pending_static_linked_cogs.clear();
 
             //Activate all the other cogs
             for(const auto& [module_name, module_ptr] : CogManager::Get().registry)
