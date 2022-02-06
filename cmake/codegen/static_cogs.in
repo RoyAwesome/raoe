@@ -21,12 +21,12 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
     DO NOT EDIT
 */
 
-#include <vector>
-
 namespace RAOE::_GENERATED
 {
+    ${extern_cog_declarations}
+
     extern "C" void LoadStaticCogs()
     {
-        //
+        ${extern_cog_definitions}
     }
 }

@@ -8,3 +8,5 @@ include(cmake/Cogs.cmake)
 
 add_subdirectory("third_party")
 add_subdirectory("src")
+
+raoe_generate_static_cogs("roae-app")

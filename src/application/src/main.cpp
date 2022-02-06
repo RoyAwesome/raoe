@@ -36,8 +36,6 @@ int main(int argc, char* argv[])
 
     RAOE::Engine& engine = RAOE::Engine::Init(argc, argv);
 
-   // RAOE::Cogs::Test();
-
     //HACKHACK - Make a window here (TODO: Find a better place to do this)
     if(auto flecs_cog = RAOE::CogManager::Get().get_cog<RAOE::Cogs::FlecsCog>().lock() )
     {

@@ -35,3 +35,5 @@ target_compile_definitions(${PROJECT_NAME}
 
 
 add_library(raoe::cog::sdl_flecs ALIAS ${PROJECT_NAME})
+
+raoe_register_cog("sdl_flecs_cog")

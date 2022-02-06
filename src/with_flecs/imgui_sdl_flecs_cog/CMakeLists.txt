@@ -10,6 +10,7 @@ add_subdirectory("third_party")
 add_library(${PROJECT_NAME}
     STATIC
     "src/imgui_module.cpp"
+    "src/imgui_cog.cpp"
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
@@ -31,3 +32,5 @@ target_link_libraries(
 )
 
 add_library(raoe::cog::imgui_sdl_flecs ALIAS ${PROJECT_NAME})
+
+raoe_register_cog("imgui_sdl_flecs_cog")

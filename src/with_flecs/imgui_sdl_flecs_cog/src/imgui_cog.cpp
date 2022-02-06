@@ -14,21 +14,24 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-
-/*
-    GENERATED FILE
-
-    DO NOT EDIT
-*/
-
 #include "engine_cog.hpp"
+#include "flecs_cog.hpp"
+#include "imgui_module.hpp"
 
-namespace RAOE::_GENERATED
+namespace RAOE::Cogs
 {
-    extern "C" void __GENERATED__flecs_cog(); 
+    using IEngineCog = RAOE::IEngineCog;
 
-    extern "C" void LoadStaticCogs()
+    struct ImguiSdlFlecsCog : public IEngineCog
     {
-        __GENERATED__flecs_cog();
-    }
+        virtual void activated()
+        {
+            if(auto flecs_cog = CogManager::Get().get_cog<RAOE::Cogs::FlecsCog>().lock())
+            {
+                flecs_cog->ecs_world_client->import<RAOE::ECS::Imgui::Module>();
+            }
+        }
+    };
+
+    REGISTER_COG(imgui_sdl_flecs_cog, ImguiSdlFlecsCog)
 }

@@ -28,3 +28,5 @@ target_link_libraries(
 )
 
 add_library(raoe::cog::flecs ALIAS ${PROJECT_NAME})
+
+raoe_register_cog("flecs_cog")
