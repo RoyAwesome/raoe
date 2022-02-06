@@ -97,16 +97,5 @@ namespace RAOE::Cogs
     
     }
 
-    void Test()    
-    {
-        spdlog::info("Test!");
-        auto engine_cog = RAOE::CogManager::Get().get_cog<RAOE::Cogs::Engine>().lock();
-        spdlog::warn("ECog: {}", engine_cog->name);
-    
-    }
-
-
     REGISTER_COG(flecs_cog, FlecsCog)
-    
-
 }
