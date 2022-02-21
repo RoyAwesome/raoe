@@ -99,27 +99,7 @@ function(raoe_add_cog)
     endif()
 endfunction()
 
-
-function(raoe_register_cog cog_name)   
-    set_property(GLOBAL APPEND PROPERTY RAOE_STATIC_COGS ${cog_name})
-endfunction()
-
 function(raoe_generate_static_cogs targets_to_set_include)
-    
-    #OLD GENERATION CODE
-    unset(extern_cog_declarations)
-    unset(extern_cog_definitions)
-
-    unset(all_static_cogs)
-    get_property(all_static_cogs GLOBAL PROPERTY RAOE_STATIC_COGS)
-
-    foreach(cog_name ${all_static_cogs})
-        string(APPEND extern_cog_declarations   "extern \"C\" void __GENERATED__${cog_name}();\n")
-        string(APPEND extern_cog_definitions    "__GENERATED__${cog_name}();\n")
-    endforeach()
-    #END OLD GENERATION CODE
-
-    #NEW GENERATION CODE
     unset(all_static_cog_function_declarations)
     unset(all_static_cog_function_definitions)
 
@@ -130,8 +110,6 @@ function(raoe_generate_static_cogs targets_to_set_include)
         string(APPEND all_static_cog_function_declarations "extern \"C\" char ${static_cog_function_name}();\n")
         string(APPEND all_static_cog_function_definitions "${static_cog_function_name}();\n")
     endforeach()
-    #END NEW GENERATION CODE
-
 
     configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/codegen/static_cogs.in
         ${CMAKE_CURRENT_BINARY_DIR}/src/application/include/static_cogs.inl)
@@ -150,6 +128,8 @@ function(raoe_link_static_cogs_to_target target_to_add_deps_to)
     if(NOT target_to_add_deps_to)
         message(ERROR "Must have a target to set static cogs to link to")
     endif()
+
+    raoe_generate_static_cogs(${target_to_add_deps_to})
 
     get_property(all_static_cogs GLOBAL PROPERTY RAOE_ALL_STATIC_COGS)
 

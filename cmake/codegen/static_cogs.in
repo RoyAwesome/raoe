@@ -26,18 +26,10 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::_GENERATED
 {
-    //OLD STATIC COGS
-    ${extern_cog_declarations}
-
-    //NEW STATIC COGS
     ${all_static_cog_function_declarations}
 
     extern "C" void LoadStaticCogs()
     {
-        //OLD STATIC COGS
-        ${extern_cog_definitions}
-
-        //NEW STATIC COGS
         ${all_static_cog_function_definitions}
     }
 }
