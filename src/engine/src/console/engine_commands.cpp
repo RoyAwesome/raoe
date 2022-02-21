@@ -14,30 +14,30 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+#include "console/console.hpp"
+#include "engine_cog.hpp"
+#include "engine.hpp"
 
-/*
-    GENERATED FILE
-
-    DO NOT EDIT
-*/
-#pragma once
-
-#include "cogs/cog.hpp"
-
-namespace RAOE::_GENERATED
+namespace RAOE::Console
 {
-    //OLD STATIC COGS
-    ${extern_cog_declarations}
+/*
+    static Command quit_command(
+        "quit",
+        "Exits the engine",
+        [](const CommandArgs& args) {
+            if(auto engine_cog = RAOE::CogManager::Get().get_cog<RAOE::Cogs::Engine>().lock())
+            {
+                engine_cog->engine_ptr->request_exit();
+            }
+        }
+    );
 
-    //NEW STATIC COGS
-    ${all_static_cog_function_declarations}
-
-    extern "C" void LoadStaticCogs()
-    {
-        //OLD STATIC COGS
-        ${extern_cog_definitions}
-
-        //NEW STATIC COGS
-        ${all_static_cog_function_definitions}
-    }
+    static Command log_command(
+        "log",
+        "prints the arguments to the log",
+        [](const CommandArgs& args) {
+            spdlog::info(args.args_as_string);
+        }
+    );
+*/
 }

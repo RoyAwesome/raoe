@@ -10,6 +10,9 @@ add_library(${PROJECT_NAME}
     "src/engine.cpp"
     "src/engine_cog.cpp"
     "src/engine_ticker.cpp"
+    "src/console/console.cpp"
+    "src/console/engine_commands.cpp"
+    "src/cogs/cog.cpp"
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

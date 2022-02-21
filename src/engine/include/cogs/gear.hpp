@@ -14,30 +14,14 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-
-/*
-    GENERATED FILE
-
-    DO NOT EDIT
-*/
 #pragma once
 
-#include "cogs/cog.hpp"
+#include "vc/Core.hpp"
 
-namespace RAOE::_GENERATED
+namespace RAOE::Cogs
 {
-    //OLD STATIC COGS
-    ${extern_cog_declarations}
-
-    //NEW STATIC COGS
-    ${all_static_cog_function_declarations}
-
-    extern "C" void LoadStaticCogs()
+    class Gear
     {
-        //OLD STATIC COGS
-        ${extern_cog_definitions}
-
-        //NEW STATIC COGS
-        ${all_static_cog_function_definitions}
-    }
+        
+    };
 }

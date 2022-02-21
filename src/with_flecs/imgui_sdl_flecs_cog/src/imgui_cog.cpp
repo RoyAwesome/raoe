@@ -33,5 +33,7 @@ namespace RAOE::Cogs
         }
     };
 
+    
+
     REGISTER_COG(imgui_sdl_flecs_cog, ImguiSdlFlecsCog)
 }
