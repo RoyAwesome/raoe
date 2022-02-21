@@ -9,7 +9,6 @@ add_library(${PROJECT_NAME}
     STATIC
     "src/engine.cpp"
     "src/console/console.cpp"
-    "src/console/engine_commands.cpp"
     "src/cogs/cog.cpp"
 )
 

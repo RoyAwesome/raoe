@@ -23,19 +23,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Console
 {
-     class CommandProcessor;
+    class CommandProcessor;
 
-    struct ConsoleHandle
-    {
-        ConsoleHandle(IConsoleElement* in_console_element)
-            : element(in_console_element)
-        {
-        }
-    private:
-        IConsoleElement* element;
-    };
-
-    
     struct CommandArgs
     {
         std::weak_ptr<CommandProcessor> command_processor;
@@ -45,14 +34,44 @@ namespace RAOE::Console
     using CommandFunctor = void(const CommandArgs&);
 
     struct Command : public IConsoleElement
-    {
-        
-        Command(std::string_view command_name, std::string_view description, std::function<CommandFunctor>&& functor, EConsoleFlags flags = EConsoleFlags::None);
+    {        
+        Command(
+            std::string_view in_command_name, 
+            std::string_view in_description, 
+            std::function<CommandFunctor> in_functor, 
+            EConsoleFlags in_flags = EConsoleFlags::None
+        )
+        : m_name(in_command_name)
+        , m_description(in_description)
+        , m_functor(in_functor)
+        , m_flags(in_flags)
+        {            
+        }
 
-        std::string name;
-        std::string description;
-        std::function<CommandFunctor> functor;
-        EConsoleFlags flags;
+        virtual std::string_view name() const override { return m_name; }
+        virtual std::string_view description() const override { return m_description; }
+        virtual EConsoleFlags flags() const override { return m_flags; }
+
+        std::string m_name;
+        std::string m_description;
+        std::function<CommandFunctor> m_functor;
+        EConsoleFlags m_flags;
     };
+
+    struct AutoRegisterConsoleCommand : public AutoRegisterConsoleElement
+    {
+        AutoRegisterConsoleCommand(Command* in_command)
+            : AutoRegisterConsoleElement(in_command)
+        {
+        }
+
+        Command* GetConsoleCommand() { return static_cast<Command*>(console_element()); }
+    };
+
+    AutoRegisterConsoleCommand CreateConsoleCommand(std::string_view name,
+        std::string_view description,
+        std::function<CommandFunctor> functor, 
+        EConsoleFlags flags = EConsoleFlags::None
+    );
 
 }

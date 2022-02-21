@@ -33,31 +33,36 @@ namespace RAOE::Console
 
     class IConsoleElement
     {
+    public:
         virtual std::string_view name() const = 0;
         virtual std::string_view description() const = 0;
         virtual EConsoleFlags flags() const = 0;
     };
 
-   
-   
-
     struct AutoRegisterConsoleElement
     {
-       
+        AutoRegisterConsoleElement(IConsoleElement* in_constructed_element)
+            : constructed_element(in_constructed_element)
+        {
+        }
 
-       private:
-       IConsoleElement* constructed_element;
+        IConsoleElement* console_element() { return constructed_element; }
+
+    private:
+        IConsoleElement* constructed_element;
     };
 
+  
     class CommandRegistry
     {
     public:
         static CommandRegistry& Get();
-        friend struct Command;
+        friend struct Command;       
+       
+        IConsoleElement* register_console_element(std::function<IConsoleElement*()> factory);
 
 
-
-        const std::vector<std::unique_ptr<IConsoleElement>>& commands() const { return element_registry; }    
+        const std::vector<std::unique_ptr<IConsoleElement>>& elements() const { return element_registry; }    
     private:        
         std::vector<std::unique_ptr<IConsoleElement>> element_registry;
     };

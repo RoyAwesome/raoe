@@ -15,40 +15,45 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include "console/console.hpp"
+#include "console/command.hpp"
 
 #include <optional>
 
 namespace RAOE::Console
 {
-/*
-    Command::Command(
-        std::string_view in_command_name, 
-        std::string_view in_description, 
-        std::function<CommandFunctor>&& in_functor, 
-        ECommandFlags in_flags
-    )    
-    : name(in_command_name)
-    , description(in_description)
-    , functor(in_functor)
-    , flags(in_flags)
-    {
-        CommandRegistry::Get().register_command(*this);
-    }
-
-    static std::optional<CommandRegistry>& command_registry_singleton()
+     static std::optional<CommandRegistry>& registry_singleton()
     {
         static std::optional<CommandRegistry> singleton(std::in_place);
         return singleton;
     }
-
-    CommandRegistry& CommandRegistry::Get()    
+    CommandRegistry& CommandRegistry::Get()
     {
-        return command_registry_singleton().value();
+        return registry_singleton().value();
     }
 
-    void CommandRegistry::register_command(Command& command)
+    AutoRegisterConsoleCommand CreateConsoleCommand(std::string_view name,
+        std::string_view description,
+        std::function<CommandFunctor> functor, 
+        EConsoleFlags flags
+    )
     {
-        command_registry.push_back(std::move(command));
+        Command* cmd = static_cast<Command*>(CommandRegistry::Get().register_console_element([=]() -> IConsoleElement*
+            {
+                return new Command(
+                    name,
+                    description,
+                    functor,
+                    flags
+                );
+            }           
+        ));
+
+        return AutoRegisterConsoleCommand(cmd);
     }
-*/
+
+    IConsoleElement* CommandRegistry::register_console_element(std::function<IConsoleElement*()> factory)    
+    {
+        std::unique_ptr<IConsoleElement>& element = element_registry.emplace_back(std::unique_ptr<IConsoleElement>(factory()));
+        return element.get();
+    }
 }

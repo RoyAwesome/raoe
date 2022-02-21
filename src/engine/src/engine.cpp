@@ -18,6 +18,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <cassert>
 #include "cogs/cog.hpp"
 
+#include "console/console.hpp"
+#include "console/command.hpp"
+
 namespace RAOE
 {
     const std::string EngineCogName("Global::Engine");
@@ -94,6 +97,28 @@ namespace RAOE
         };
     }
 
+    using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
+    using CommandArgs = RAOE::Console::CommandArgs;
+    static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
+        "quit",
+        "Exits the game",
+        [](const CommandArgs& args) {
+            Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
+            if(engine_gear != nullptr)
+            {
+                engine_gear->request_exit();
+            }
+        }
+    );
+
+    static AutoRegisterConsoleCommand log_command = RAOE::Console::CreateConsoleCommand(
+        "log",
+        "prints the arguments to the log",
+        [](const CommandArgs& args) {
+            spdlog::info(args.args_as_string);
+        }
+    );
+
     Engine& Engine::Init(int32 argc, char* argv[])
     {
         spdlog::info("Initializing Roy Awesome's Open Engine (RAOE)");
@@ -109,6 +134,12 @@ namespace RAOE
         RAOE::Cogs::Registry::Get().create_statically_linked_cogs();
         RAOE::Cogs::Registry::Get().transition_cogs(RAOE::Cogs::ECogStatus::PreActivate, TransitionFunc::ConstructGears);
         RAOE::Cogs::Registry::Get().transition_cogs(RAOE::Cogs::ECogStatus::Activated, TransitionFunc::ActivateGears);
+
+        spdlog::info("Registered Commands: ");
+        for(auto& cmd : Console::CommandRegistry::Get().elements())
+        {
+            spdlog::info("\t{} - {}", cmd->name(), cmd->description());
+        }
 
         return *EngineCog.engine_ptr.get();
     }
