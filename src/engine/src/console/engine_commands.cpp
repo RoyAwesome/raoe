@@ -15,7 +15,6 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include "console/console.hpp"
-#include "engine_cog.hpp"
 #include "engine.hpp"
 
 namespace RAOE::Console

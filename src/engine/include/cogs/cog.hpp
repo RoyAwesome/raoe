@@ -25,6 +25,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Cogs
 {
+    inline namespace _
+    {
+        template<typename T>
+        struct NamedObjectFactory
+        {
+            std::string name;
+            std::function<T*()> factory_func;
+        };
+    }
     enum class ECogStatus : uint8
     {
         Created,
@@ -36,52 +45,99 @@ namespace RAOE::Cogs
 
     class BaseCog
     {
+        friend class Registry;
     protected:
         explicit BaseCog(std::string&& in_name)
             : m_status(ECogStatus::Created)
             , m_name(in_name)
         {
-            
         }     
-        virtual void register_gears() = 0;
-        void register_gear(std::shared_ptr<Gear> gear_ptr);
 
+        template<class T>
+            requires std::derived_from<T, Gear> && std::default_initializable<T>
+        void register_gear(std::string_view name)
+        {
+            gear_factories.emplace_back(GearFactory{std::string(name), [](){ return new T(); }});
+        }
+
+        void register_gear(std::string_view name, std::function<Gear*()> gear_factory)
+        {
+            gear_factories.emplace_back(GearFactory{std::string(name), gear_factory});
+        };
+             
     public:
         ECogStatus status() { return m_status; }
         std::string_view name() { return m_name; }
+        virtual void register_gears() = 0;   
+        void construct_gears();
+
+        virtual bool is_engine_cog() { return false; }
     private:
         ECogStatus m_status;
-        std::string m_name;    
+        std::string m_name;   
+
+        using GearFactory = NamedObjectFactory<Gear>;
+        std::vector<GearFactory> gear_factories;
+        
     };
 
     class Registry
     {
     public:
+        using CogRegistryType = std::unordered_map<std::string, std::unique_ptr<BaseCog>>;
+        using GearRegistryType = std::unordered_map<std::string, std::tuple<std::unique_ptr<Gear>, BaseCog*>>;
+
+    public:
         static Registry& Get();
 
         template<class T>
             requires std::derived_from<T, BaseCog> && std::default_initializable<T>
-        BaseCog& register_cog(std::string_view name)
+        BaseCog& construct_cog(std::string_view name)
         {
-            auto pair = registered_cogs.emplace(std::string(name), std::unique_ptr<BaseCog>(new T()));
-            return *(pair.first->second.get()); 
+           return construct_cog(name, [](){return new T(); });
         }
+
+        BaseCog& construct_cog(std::string_view name, std::function<BaseCog*()> factory);
+        void create_statically_linked_cogs();
+
+        template<class T>
+            requires std::derived_from<T, BaseCog> && std::default_initializable<T>
+        std::string_view register_cog_static_linked(std::string_view name)
+        {
+            static_registered_cogs.emplace_back(StaticRegisteredCogFactory{std::string(name), [](){ return new T(); } });
+            return name;
+        }
+        void transition_cogs(ECogStatus transition_to, std::function<void(BaseCog&)> transition_func);
+
+        void transition_cog(std::string cog_name, ECogStatus transition_to, std::function<void(BaseCog&)> transition_func);
+
+        BaseCog* get_cog(std::string_view cog_name);
+
+        Gear* get_gear(std::string_view gear_name);
+
+        Gear& construct_gear(std::string_view name, std::function<Gear*()> factory, BaseCog* owning_cog = nullptr);
+
+        template<class T>
+            requires std::derived_from<T, Gear> && std::default_initializable<T>
+        Gear& construct_gear(std::string_view name, BaseCog* owning_cog = nullptr)
+        {
+            return construct_gear(name, [](){ return new T(); }, owning_cog);
+        }
+
+
+        const CogRegistryType& cogs() { return registered_cogs; }
+        const GearRegistryType& gears() { return registered_gears; }
+
     private:
-        std::unordered_map<std::string, std::unique_ptr<BaseCog>> registered_cogs;
+        CogRegistryType registered_cogs;      
+        GearRegistryType registered_gears;
+
+        using StaticRegisteredCogFactory = NamedObjectFactory<BaseCog>;      
+        std::vector<StaticRegisteredCogFactory> static_registered_cogs;
     };
 
 }
 
-#ifndef STRINGIZE
-#define STRINGIZE(A) #A
-#define STRINGIZE_DEFINED_HERE
-#endif
-
-#define __GENERATED_REGISTER_COG(CogName, CogTypename, CogFunctionName) \
-    static RAOE::Cogs::BaseCog& __REGISTERED_COG_##CogName = RAOE::Cogs::Registry::Get().register_cog<CogTypename>(STRINGIZE(CogName)); \
-    extern "C" const RAOE::Cogs::BaseCog& CogFunctionName() { return __REGISTERED_COG_##CogName; }
-
-#ifdef STRINGIZE_DEFINED_HERE
-#undef STRINGIZE
-#undef STRINGIZE_DEFINED_HERE
-#endif
+#define __GENERATED_REGISTER_COG(CogName, CogTypename, CogQualifiedName, CogFunctionName) \
+    static std::string_view __REGISTERED_COG_##CogName = RAOE::Cogs::Registry::Get().register_cog_static_linked<CogTypename>(CogQualifiedName); \
+    extern "C" const char CogFunctionName() { return __REGISTERED_COG_##CogName.front(); }

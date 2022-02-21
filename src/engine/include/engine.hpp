@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include <functional>
 #include <vc/Core.hpp>
-#include "engine_cog.hpp"
+#include "cogs/gear.hpp"
 
 #pragma once
 
@@ -34,27 +34,43 @@ namespace RAOE
         static Engine& Init(int32 argc, char* argv[]);
         bool Run();
         void Shutdown();
-    public:
-      
-        void request_exit() { exit_requested = true; }
-        bool should_exit() const { return exit_requested; }
-
-    private:
-        bool exit_requested = false;
     };
 
-    namespace Cogs
+    namespace _
     {
-        /* Engine Cog
-            This is a special cog that contains the engine object.  When the Engine is created, the Engine will create this cog and activate it before any other cog
-            It is also the last cog to shutdown
+        struct EngineCog;
+    }
+    namespace Gears
+    {
+        /* Engine Gear
+            This is a special gear that represents the game engine.  It it initalized first, and is also the last to be destroyed
+            It can be accessed by "Engine::Gear"
         */
-        struct Engine : public RAOE::IEngineCog
-        {
-            virtual void activated() override {}
-            virtual void deactivated() override {}
+        extern const std::string EngineGearName;
 
-            std::unique_ptr<RAOE::Engine> engine_ptr;
+        class Engine : public RAOE::Cogs::Gear
+        {   
+        public:         
+            friend struct RAOE::_::EngineCog;
+
+            void request_exit() { exit_requested = true; }
+            bool should_exit() const { return exit_requested; }
+
+            void register_tickfunc(std::function<void()>&& tickfunc)
+            {
+                tick_funcs.emplace_back(std::move(tickfunc));
+            }
+
+            const std::vector<std::function<void()>>& tickfuncs() { return tick_funcs; }
+        private:
+            Engine()
+            {
+
+            }        
+
+            bool exit_requested = false;
+
+            std::vector<std::function<void()>> tick_funcs;
         };       
     }
 }

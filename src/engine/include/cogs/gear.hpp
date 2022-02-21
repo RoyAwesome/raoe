@@ -22,6 +22,15 @@ namespace RAOE::Cogs
 {
     class Gear
     {
-        
+    public:
+        virtual void activated() {}
+        virtual void deactivated() {}
     };
 }
+
+
+#define RAOE_DEFINE_GEAR(GearName, GearClass) \
+    extern RAOE::Cogs::Gear* __GENERATED_CONSTRUCT_##GearName() { return new GearClass(); }
+
+#define RAOE_REGISTER_GEAR_FACTORY(GearName) \
+    register_gear(#GearName, __GENERATED_CONSTRUCT_##GearName);

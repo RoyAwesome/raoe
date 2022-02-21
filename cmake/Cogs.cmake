@@ -68,16 +68,19 @@ function(raoe_add_cog)
     ${raoe_add_cog_COMPILE_DEFINITIONS}
     )
 
-    #if this has gears, collect them now and generate 
-
-
-
     #generate the cog file, unless the target says no
     if(NOT raoe_add_cog_NO_GENERATED_COG)
         set(cog_generated_namespace ${raoe_add_cog_NAMESPACE})
         set(cog_generated_name ${raoe_add_cog_NAME})
         set(cog_generated_gear_external_definitions "")
         set(cog_generated_gear_external_declarations "")
+        #if this has gears, generate them
+        foreach(cog_gear_name ${raoe_add_cog_GEARS})
+            string(APPEND cog_generated_gear_external_definitions "extern RAOE::Cogs::Gear* __GENERATED_CONSTRUCT_${cog_gear_name}();")
+            string(APPEND cog_generated_gear_external_declarations "RAOE_REGISTER_GEAR_FACTORY(${cog_gear_name})")
+        endforeach()
+        
+
         set(cog_generated_external_function_name "__GENERATED__${raoe_add_cog_NAME}")
         set_property(GLOBAL APPEND PROPERTY RAOE_STATIC_COG_FUNCTION_NAMES ${cog_generated_external_function_name})
 
@@ -124,7 +127,7 @@ function(raoe_generate_static_cogs targets_to_set_include)
     get_property(all_static_cog_function_names GLOBAL PROPERTY RAOE_STATIC_COG_FUNCTION_NAMES)
 
     foreach(static_cog_function_name ${all_static_cog_function_names})
-        string(APPEND all_static_cog_function_declarations "extern \"C\" const RAOE::Cogs::BaseCog& ${static_cog_function_name}();\n")
+        string(APPEND all_static_cog_function_declarations "extern \"C\" char ${static_cog_function_name}();\n")
         string(APPEND all_static_cog_function_definitions "${static_cog_function_name}();\n")
     endforeach()
     #END NEW GENERATION CODE

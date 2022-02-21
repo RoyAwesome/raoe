@@ -23,8 +23,6 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "imgui_impl_sdlrenderer.h"
 
 #include "imcmd_command_palette.h"
-#include "engine_cog.hpp"
-#include "flecs_cog.hpp"
 
 namespace RAOE::ECS::Imgui
 {

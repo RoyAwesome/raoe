@@ -13,4 +13,6 @@ raoe_add_cog(
             glm
             spdlog
             vc::core
+    GEARS
+        "NewGearTest"
 )

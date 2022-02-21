@@ -14,12 +14,14 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#include "flecs_cog.hpp"
+#include "flecs_gear.hpp"
 #include "engine.hpp"
 #include "client_app_module.hpp"
+#include "cogs/cog.hpp"
 
-namespace RAOE::Cogs
+namespace RAOE::Gears
 {
+    const std::string FlecsGearName("Flecs::ECS::FlecsGear");
 
     void LogECS(int32 level,  const char *file,  int32 line, const char *msg)
     {
@@ -64,27 +66,26 @@ namespace RAOE::Cogs
     }
 
 
-    FlecsCog::FlecsCog()   
-        : IEngineCog() 
-        , ecs_world_client(std::make_unique<flecs::world>())
+    FlecsGear::FlecsGear()   
+        : ecs_world_client(std::make_unique<flecs::world>())
     {
         InitFLECSSystem();    
     }
 
-    void FlecsCog::activated()    
+    void FlecsGear::activated()    
     {
-        register_tickfunc([this](){
+        Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
+        engine_gear->register_tickfunc([this, engine_gear]()
+        {
             if(ecs_world_client)
             {
                 if(!ecs_world_client->progress())
                 {
-                    if(std::shared_ptr<RAOE::Cogs::Engine> engine_cog = CogManager::Get().get_cog<RAOE::Cogs::Engine>().lock())
-                    {
-                        engine_cog->engine_ptr->request_exit();
-                    }                   
+                    engine_gear->request_exit();
                 }
             }
-        });  
+        });
+      
 
         if(ecs_world_client)
         {
@@ -92,10 +93,10 @@ namespace RAOE::Cogs
         }    
     }
 
-    void FlecsCog::deactivated()    
+    void FlecsGear::deactivated()    
     {
     
-    }
-
-    REGISTER_COG(flecs_cog, FlecsCog)
+    }    
 }
+
+RAOE_DEFINE_GEAR(FlecsGear, RAOE::Gears::FlecsGear)

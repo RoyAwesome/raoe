@@ -15,22 +15,21 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #pragma once
+#include "cogs/gear.hpp"
+#include "flecs.h"
+#include <string>
 
-#include "engine_cog.hpp"
-
-namespace RAOE::Cogs
+namespace RAOE::Gears
 {
-    inline namespace _
+    extern const std::string FlecsGearName;
+    struct FlecsGear : public RAOE::Cogs::Gear
     {
-        struct Ticker : public RAOE::IEngineCog
-        {
-            using Registry = std::unordered_map<std::string, std::function<void()>>;
-            virtual void activated() override {}
-            virtual void deactivated() override {}
-            
-            void run_tick();
+        FlecsGear();
+      
+        virtual void activated() override;
+        virtual void deactivated() override;
 
-            Registry tick_funcs;
-        };
-    }
+        std::unique_ptr<flecs::world> ecs_world_client;
+        //std::unique_ptr<flecs::world> ecs_world_server; //TODO: Server World
+    };
 }

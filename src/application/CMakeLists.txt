@@ -20,9 +20,6 @@ target_link_libraries(${PROJECT_NAME}
     glm
     spdlog
     raoe::engine
-    raoe::cog::flecs
-    raoe::cog::sdl_flecs
-    raoe::cog::imgui_sdl_flecs
 )
 
 target_compile_definitions(${PROJECT_NAME}

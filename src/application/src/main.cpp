@@ -16,8 +16,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "engine.hpp"
 
-#include "engine_cog.hpp"
-#include "flecs_cog.hpp"
+#include "cogs/cog.hpp"
+#include "flecs_gear.hpp"
 #include "client_app_module.hpp"
 
 #ifndef RAOE_STATIC_COGS
@@ -37,9 +37,11 @@ int main(int argc, char* argv[])
     RAOE::Engine& engine = RAOE::Engine::Init(argc, argv);
 
     //HACKHACK - Make a window here (TODO: Find a better place to do this)
-    if(auto flecs_cog = RAOE::CogManager::Get().get_cog<RAOE::Cogs::FlecsCog>().lock() )
+    using FlecsGear = RAOE::Gears::FlecsGear;
+    FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
+    if(flecs_gear)
     {
-        flecs_cog->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
+        flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
     }
     else
     {

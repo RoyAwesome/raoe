@@ -14,23 +14,25 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
-#include "engine_cog.hpp"
+#include "cogs/cog.hpp"
+#include "flecs_gear.hpp"
+#include "sdl_module.hpp"
 
-#include "flecs.h"
-
-namespace RAOE::Cogs
+namespace RAOE::Gears
 {
-    struct FlecsCog : public IEngineCog
+  
+    struct SDLFLECSGear : public RAOE::Cogs::Gear
     {
-        FlecsCog();
-      
-        virtual void activated() override;
-        virtual void deactivated() override;
+        virtual void activated()
+        {
+            FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
 
-        std::unique_ptr<flecs::world> ecs_world_client;
-        //std::unique_ptr<flecs::world> ecs_world_server; //TODO: Server World
+            if(flecs_gear)
+            {
+                flecs_gear->ecs_world_client->import<RAOE::ECS::SDL::Module>();
+            }
+        }
     };
-
-    void Test();
 }
+
+RAOE_DEFINE_GEAR(SDLGear, RAOE::Gears::SDLFLECSGear)

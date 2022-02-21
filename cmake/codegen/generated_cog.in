@@ -29,8 +29,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #define COG_NAME ${cog_generated_name}
 #endif
 
-#define STRINGIZE(A) #A
-#define QUALIFIED_COG_NAME STRINGIZE(COG_NAMESPACE) "::" STRINGIZE(COG_NAME)
+#define QUAL_NAME_TEXT(T) T
+#define QUAL_NAME_STR_2(T) QUAL_NAME_TEXT(#T)
+#define QUAL_NAME_STR(T) QUAL_NAME_STR_2(T)
+
+#define QUALIFIED_COG_NAME QUAL_NAME_STR(COG_NAMESPACE) QUAL_NAME_TEXT("::") QUAL_NAME_STR(COG_NAME)
 
 
 #include "cogs/cog.hpp"
@@ -48,11 +51,11 @@ namespace RAOE::Cogs::_GENERATED::COG_NAMESPACE
 
         }
         
-        virtual void register_gears()
+        virtual void register_gears() override
         {
             ${cog_generated_gear_external_declarations}
         }
     };    
 }
 
-__GENERATED_REGISTER_COG(COG_NAME, RAOE::Cogs::_GENERATED::COG_NAMESPACE::COG_NAME, ${cog_generated_external_function_name})
+__GENERATED_REGISTER_COG(COG_NAME, RAOE::Cogs::_GENERATED::COG_NAMESPACE::COG_NAME, QUALIFIED_COG_NAME, ${cog_generated_external_function_name})

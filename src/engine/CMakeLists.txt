@@ -8,8 +8,6 @@ LANGUAGES CXX
 add_library(${PROJECT_NAME}
     STATIC
     "src/engine.cpp"
-    "src/engine_cog.cpp"
-    "src/engine_ticker.cpp"
     "src/console/console.cpp"
     "src/console/engine_commands.cpp"
     "src/cogs/cog.cpp"
