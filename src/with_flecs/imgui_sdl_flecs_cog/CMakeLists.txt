@@ -17,6 +17,7 @@ raoe_add_cog(
             imgui_command_palette 
             Flecs::ECS
             Flecs::SDL
+            Global::Console
     GEARS
         "ImguiGear"
 )

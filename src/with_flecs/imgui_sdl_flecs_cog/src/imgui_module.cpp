@@ -24,6 +24,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "imcmd_command_palette.h"
 
+#include "console/command.hpp"
+#include "flecs_gear.hpp"
+#include "cogs/cog.hpp"
+#include "console_gear.hpp"
+
 namespace RAOE::ECS::Imgui
 {
     using SDLSystem = RAOE::SDL::System;
@@ -33,6 +38,7 @@ namespace RAOE::ECS::Imgui
     {
         bool should_show_command_palette;
         bool should_show_demo_window;
+        bool should_show_console;
     };
 
     void NewFrame(flecs::entity e, const SDLSystem& sdl_system)
@@ -53,6 +59,16 @@ namespace RAOE::ECS::Imgui
             {
                 ImGui::ShowDemoWindow();
             }
+
+            if(info->should_show_console)
+            {
+                using ConsoleGear = RAOE::Gears::ConsoleGear;
+                ConsoleGear* console_gear = static_cast<ConsoleGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::ConsoleGearName));
+                if(console_gear && console_gear->display_console())
+                {
+                    console_gear->display_console()->Draw("Console", &info->should_show_console);
+                }
+            }
         }
     }
 
@@ -70,6 +86,23 @@ namespace RAOE::ECS::Imgui
                     info->should_show_command_palette = !info->should_show_command_palette;
                 }
             }
+            if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDL_KeyCode::SDLK_F3)
+            {
+                ImCmdInfo* info = e.world().module<Module>().get_mut<ImCmdInfo>();
+                if(info)
+                {
+                    info->should_show_demo_window = !info->should_show_demo_window;
+                }
+            }
+
+            if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDL_KeyCode::SDLK_BACKQUOTE)
+            {
+                ImCmdInfo* info = e.world().module<Module>().get_mut<ImCmdInfo>();
+                if(info)
+                {
+                    info->should_show_console = !info->should_show_console;
+                }
+            }
         }
     }
 
@@ -79,20 +112,21 @@ namespace RAOE::ECS::Imgui
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     }  
 
-    /*
-    static RAOE::Console::Command show_demo_command(
+    using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
+    using CommandArgs = RAOE::Console::CommandArgs;
+    static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
         "ShowDemo",
-        "Shows the demo window",
-        [](const RAOE::Console::CommandArgs& args)
-        {
-            if(auto flecs_cog = CogManager::Get().get_cog<RAOE::Cogs::FlecsCog>().lock())
+        "Shows the Demo Window",
+        [](const CommandArgs& args) {
+            using FlecsGear = RAOE::Gears::FlecsGear;
+            FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
+            if(flecs_gear)
             {
-                bool& should_show_menu = flecs_cog->ecs_world_client->module<Module>().get_mut<ImCmdInfo>()->should_show_demo_window;
+                bool& should_show_menu = flecs_gear->ecs_world_client->module<Module>().get_mut<ImCmdInfo>()->should_show_demo_window;
                 should_show_menu = !should_show_menu;
             }
         }
     );
-   */
 
     Module::Module(flecs::world& world)    
     {  
@@ -101,22 +135,10 @@ namespace RAOE::ECS::Imgui
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-        world.module<Module>().set<ImCmdInfo>({false, false});
+        world.module<Module>().set<ImCmdInfo>({false, false, false});
         ImCmd::CreateContext();
        
-       /*
-        for(const auto& console_command : RAOE::Console::CommandRegistry::Get().commands())
-        {
-            ImCmd::Command imcmd;
-            imcmd.Name = console_command.name.c_str();
-            imcmd.InitialCallback = [&console_command]()
-            {
-                RAOE::Console::CommandArgs args;
-                console_command.functor(args);
-            };
-            ImCmd::AddCommand(std::move(imcmd));
-        }
-        */
+     
 
         //Init the style
         ImGui::StyleColorsDark(); //TODO: Make this configurable by command line?
