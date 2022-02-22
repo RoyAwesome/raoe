@@ -13,20 +13,12 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 #pragma once
 
-#include <string>
+#include "enum.hpp"
+#include "types.hpp"
+#include "typename.hpp"
+#include "debug.hpp"
+#include "inline.hpp"
+#include "const_math.hpp"
 
-namespace RAOE::Console
-{
-    class DisplayConsole
-    {
-    public:
-        DisplayConsole();
-
-        virtual void Draw(std::string title, bool* p_open);
-
-        void ExecCommand(const std::string& command_line);
-    };
-}

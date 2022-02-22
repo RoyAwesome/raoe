@@ -16,17 +16,14 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include <string>
+#include <cstdint>
 
-namespace RAOE::Console
-{
-    class DisplayConsole
-    {
-    public:
-        DisplayConsole();
+using uint8 = uint8_t;  
+using uint16 = uint16_t;   
+using uint32 = uint32_t;  
+using uint64 = uint64_t;   
 
-        virtual void Draw(std::string title, bool* p_open);
-
-        void ExecCommand(const std::string& command_line);
-    };
-}
+using int8 = int8_t;
+using int16 = int16_t;
+using int32 = int32_t;
+using int64 = int64_t;

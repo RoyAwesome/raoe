@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "vc/Core.hpp"
+#include "core.hpp"
 
 namespace RAOE::Cogs
 {

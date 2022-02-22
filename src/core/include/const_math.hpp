@@ -13,20 +13,22 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 #pragma once
 
-#include <string>
+#include <concepts>
 
-namespace RAOE::Console
+namespace raoe
 {
-    class DisplayConsole
+    namespace concepts
     {
-    public:
-        DisplayConsole();
+        template<typename T>
+        concept numeric = std::is_arithmetic_v<T>;
 
-        virtual void Draw(std::string title, bool* p_open);
-
-        void ExecCommand(const std::string& command_line);
-    };
+    }
+  
+    template<concepts::numeric T, std::integral U>
+    consteval T pow(T base, U exponent)
+    {
+        return exponent == 0 ? 1 : base * pow(base, exponent - 1);
+    }
 }

@@ -24,7 +24,7 @@ target_link_libraries(
     PUBLIC
     glm
     spdlog
-    vc::core
+    raoe::core
 )
 
 add_library(raoe::engine ALIAS ${PROJECT_NAME})

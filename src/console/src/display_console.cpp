@@ -18,6 +18,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "imgui.h"
 #include "spdlog/spdlog.h"
 #include "misc/cpp/imgui_stdlib.h"
+#include "string.hpp"
 
 namespace RAOE::Console
 {
@@ -91,6 +92,11 @@ namespace RAOE::Console
             ,(void*)this)
         )
         {
+            raoe::core::trim(input_buffer);
+            if(!input_buffer.empty())
+            {
+                ExecCommand(input_buffer);
+            }          
             reclaim_focus = true;
         }
 
@@ -99,6 +105,12 @@ namespace RAOE::Console
             ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 
         ImGui::End();
+    }
+
+    void DisplayConsole::ExecCommand(const std::string& command_line)    
+    {
+        spdlog::info("> {}", command_line);
+    
     }
 }
 

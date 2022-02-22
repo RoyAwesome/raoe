@@ -55,6 +55,7 @@ function(raoe_add_cog)
     ${COG_LIBRARY_NAME}
     ${raoe_add_cog_DEPENDENCIES}
     PUBLIC    
+        raoe::core
         raoe::engine
     )
 

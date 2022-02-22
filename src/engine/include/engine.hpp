@@ -15,7 +15,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include <functional>
-#include <vc/Core.hpp>
+#include "core.hpp"
 #include "cogs/gear.hpp"
 
 #pragma once

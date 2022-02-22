@@ -13,20 +13,16 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 #pragma once
 
-#include <string>
+//TODO: Portable forceinline here.
+#ifndef RAOE_FORCEINLINE
 
-namespace RAOE::Console
-{
-    class DisplayConsole
-    {
-    public:
-        DisplayConsole();
+#  if defined(_MSC_VER)
+    #define RAOE_FORCEINLINE __forceinline
+#else
+    #warning "RAOE_FORCEINLINE used without a compatible forceinline intrinsic.  falling back to just inline"
+    #define RAOE_FORCEINLINE inline
+#endif
 
-        virtual void Draw(std::string title, bool* p_open);
-
-        void ExecCommand(const std::string& command_line);
-    };
-}
+#endif
