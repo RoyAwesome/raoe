@@ -20,6 +20,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "misc/cpp/imgui_stdlib.h"
 #include "string.hpp"
 
+#include "console/console.hpp"
+
 namespace RAOE::Console
 {
     DisplayConsole::DisplayConsole()
@@ -110,7 +112,30 @@ namespace RAOE::Console
     void DisplayConsole::ExecCommand(const std::string& command_line)    
     {
         spdlog::info("> {}", command_line);
-    
+
+        //Parse this command into the it's constituent parts
+        std::vector<std::string> elements;
+        raoe::core::split(command_line, ' ', std::back_inserter(elements));
+
+        //Find the console command this matches
+        bool found_command = false;
+        for(auto& element : RAOE::Console::CommandRegistry::Get().elements())
+        {
+            if(element)
+            {
+                if(element->name().compare(elements[0]) == 0)
+                {
+                    spdlog::info("executing {}", command_line);
+
+                    found_command = true;
+                }
+            }
+        }
+
+        if(!found_command)
+        {
+            spdlog::warn("Cannot find command: {}", elements[0]);
+        }        
     }
 }
 
