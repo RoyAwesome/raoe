@@ -23,14 +23,6 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Console
 {
-    class CommandProcessor;
-
-    struct CommandArgs
-    {
-        std::weak_ptr<CommandProcessor> command_processor;
-        std::vector<std::string> args;
-        std::string args_as_string;
-    };
     using CommandFunctor = void(const CommandArgs&);
 
     struct Command : public IConsoleElement
@@ -51,6 +43,11 @@ namespace RAOE::Console
         virtual std::string_view name() const override { return m_name; }
         virtual std::string_view description() const override { return m_description; }
         virtual EConsoleFlags flags() const override { return m_flags; }
+        virtual EExecuteError execute(const CommandArgs& args) const
+        {
+            m_functor(args);
+            return EExecuteError::Success;
+        }
 
         std::string m_name;
         std::string m_description;

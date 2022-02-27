@@ -16,6 +16,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
+
+#include "core.hpp"
 #include <string>
 #include <functional>
 #include <vector>
@@ -31,12 +33,27 @@ namespace RAOE::Console
 
     };
 
+    struct CommandArgs
+    {
+        std::vector<std::string> args;
+        std::string args_as_string;
+    };
+
     class IConsoleElement
     {
     public:
         virtual std::string_view name() const = 0;
         virtual std::string_view description() const = 0;
         virtual EConsoleFlags flags() const = 0;
+
+        enum class EExecuteError : uint8
+        {
+            Success,
+            Invalid_Arguments,
+            Command_Error
+        };
+
+        virtual EExecuteError execute(const CommandArgs& args) const = 0;
     };
 
     struct AutoRegisterConsoleElement
@@ -66,5 +83,15 @@ namespace RAOE::Console
     private:        
         std::vector<std::unique_ptr<IConsoleElement>> element_registry;
     };
-          
+
+    enum class EConsoleError : uint8
+    {
+        None,
+        Command_Not_Found,
+        Incorrect_Arguments,
+        Not_Authorized,
+        Need_Cheats,
+    };
+
+    EConsoleError execute(std::string_view command_line);
 }

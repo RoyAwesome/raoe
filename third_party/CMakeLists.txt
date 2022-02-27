@@ -23,6 +23,7 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 CPMAddPackage("gh:g-truc/glm#master")
 CPMAddPackage("gh:gabime/spdlog#v1.9.2")
+CPMAddPackage("gh:TartanLlama/expected#master")
 
 CPMAddPackage(
   GITHUB_REPOSITORY jarro2783/cxxopts

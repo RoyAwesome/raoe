@@ -18,6 +18,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "console/command.hpp"
 
 #include <optional>
+#include "string.hpp"
 
 namespace RAOE::Console
 {
@@ -55,5 +56,38 @@ namespace RAOE::Console
     {
         std::unique_ptr<IConsoleElement>& element = element_registry.emplace_back(std::unique_ptr<IConsoleElement>(factory()));
         return element.get();
+    }
+
+    EConsoleError execute(std::string_view command_line)    
+    {
+        //Parse this command into the it's constituent parts
+        std::vector<std::string> elements;
+        raoe::core::split(std::string(command_line), ' ', std::back_inserter(elements));
+
+        CommandArgs args;
+
+        IConsoleElement* found_element = nullptr;
+
+        //Find the console command this matches
+        for(auto& element : RAOE::Console::CommandRegistry::Get().elements())
+        {
+            if(element && element->name().compare(elements[0]) == 0)
+            {
+                found_element = element.get();
+                break;                
+            }
+        }
+
+        if(found_element)
+        {
+            if(IConsoleElement::EExecuteError error = found_element->execute(args); error != IConsoleElement::EExecuteError::Success )
+            {
+                return EConsoleError::Incorrect_Arguments;
+            }
+           
+            return EConsoleError::None;
+        }
+
+        return EConsoleError::Command_Not_Found;
     }
 }

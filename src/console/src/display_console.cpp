@@ -113,29 +113,27 @@ namespace RAOE::Console
     {
         spdlog::info("> {}", command_line);
 
-        //Parse this command into the it's constituent parts
-        std::vector<std::string> elements;
-        raoe::core::split(command_line, ' ', std::back_inserter(elements));
-
-        //Find the console command this matches
-        bool found_command = false;
-        for(auto& element : RAOE::Console::CommandRegistry::Get().elements())
+        if(RAOE::Console::EConsoleError err = RAOE::Console::execute(command_line); err != RAOE::Console::EConsoleError::None)
         {
-            if(element)
+            switch(err)
             {
-                if(element->name().compare(elements[0]) == 0)
-                {
-                    spdlog::info("executing {}", command_line);
-
-                    found_command = true;
-                }
+                case RAOE::Console::EConsoleError::Command_Not_Found:
+                spdlog::warn("> Command Not Found");
+                break;
+                case RAOE::Console::EConsoleError::Incorrect_Arguments:
+                spdlog::warn("> Incorrect Arguments");
+                break;
+                case RAOE::Console::EConsoleError::Need_Cheats:
+                spdlog::warn("> Cheats are not enabled");
+                break;
+                case RAOE::Console::EConsoleError::Not_Authorized:
+                spdlog::warn("> You are not authorized to run this networked command");
+                break;
+                default:
+                spdlog::warn("> Unknown Error");
+                break;
             }
         }
-
-        if(!found_command)
-        {
-            spdlog::warn("Cannot find command: {}", elements[0]);
-        }        
     }
 }
 
