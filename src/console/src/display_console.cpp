@@ -21,6 +21,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "string.hpp"
 
 #include "console/console.hpp"
+#include "rapidfuzz/fuzz.hpp"
+#include <map>
 
 namespace RAOE::Console
 {
@@ -33,6 +35,8 @@ namespace RAOE::Console
 
         history.reserve(Max_History);
         history_pos = -1;
+
+        input_buffer.reserve(128);
     }
 
     DisplayConsole::~DisplayConsole()    
@@ -43,7 +47,7 @@ namespace RAOE::Console
     void DisplayConsole::Draw(std::string title, bool* p_open)
     {
         ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
-        if(!ImGui::Begin(title.c_str(), p_open))
+        if(!ImGui::Begin(title.c_str(), p_open, ImGuiWindowFlags_NoBringToFrontOnFocus))
         {
             ImGui::End();
             return;
@@ -86,11 +90,8 @@ namespace RAOE::Console
 
         //Command Line
         bool reclaim_focus = false;
-
-        std::string input_buffer;
-        input_buffer.reserve(128);
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-        if(ImGui::InputText("Input", 
+        if(ImGui::InputText("##Input", 
             &input_buffer, 
             input_text_flags, 
             [](ImGuiInputTextCallbackData* data) -> int 
@@ -148,9 +149,88 @@ namespace RAOE::Console
                 }
                 history.push_back(input_buffer);
                 history_pos = -1;
+
+                input_buffer = "";
             }          
             reclaim_focus = true;
         }
+
+        //Text Helper
+        //Shows either the closest matching console command to what is being typed
+        //or the history.
+
+        const bool show_input_tip = ImGui::GetIO().WantCaptureKeyboard;
+
+        if(show_input_tip)
+        {            
+            const bool show_hint = history.size() > 0 || !input_buffer.empty();
+
+            std::vector<std::string> matching_possible_commands;
+            //If the input buffer isn't empty, lets try fuzzy matching the input text to all of the possible commands
+            if(!input_buffer.empty())
+            {
+                std::map<double, RAOE::Console::IConsoleElement*> ordered_command_match;
+                for(const auto& command : RAOE::Console::CommandRegistry::Get().elements())
+                {
+                    double score = rapidfuzz::fuzz::partial_ratio(command->name(), input_buffer);
+                    if(score > 51)
+                    {
+                        ordered_command_match.insert({score, command.get()});
+                    }
+                    
+                }
+
+                //Get the top 15 matches (or fewer, if there are less matches)
+                auto back_inserter = std::back_inserter(matching_possible_commands);
+                for(int32 i = 0; i < 15; i++)
+                {
+                    if(ordered_command_match.size() <= i)
+                    {
+                        break;
+                    }
+                    
+                    auto element = ordered_command_match.begin();
+                    for(int j = 0; j < i; j++)
+                    {
+                        element++;
+                    }
+
+                    *(back_inserter++) = fmt::format("{}", element->second->name());
+                }
+            }
+
+            std::vector<std::string>& source_text = input_buffer.empty() ? history : matching_possible_commands;
+
+            ImGuiWindowFlags popup_flags = ImGuiWindowFlags_NoDecoration 
+                | ImGuiWindowFlags_AlwaysAutoResize 
+                | ImGuiWindowFlags_NoSavedSettings
+                | ImGuiWindowFlags_NoFocusOnAppearing
+                | ImGuiWindowFlags_NoNav
+                ;
+            
+            ImVec2 popup_pos = ImGui::GetItemRectMin();
+
+            ImGui::SetNextWindowPos(popup_pos, ImGuiCond_Always, ImVec2(0, 1));
+            ImGui::SetNextWindowBgAlpha(0.35f);
+            static bool p_open = true;
+            if(!source_text.empty() && ImGui::Begin("helper", &p_open, popup_flags))
+            {    
+                for(int32 i = 0; i < source_text.size(); i++)
+                {
+                    const std::string& str = source_text[i];
+                    ImGui::PushID(i);
+                    if(ImGui::Selectable(str.c_str()))
+                    {
+                        input_buffer = str;
+                        p_open = false;
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::End();
+            }
+
+
+        }    
 
         ImGui::SetItemDefaultFocus();
         if (reclaim_focus)

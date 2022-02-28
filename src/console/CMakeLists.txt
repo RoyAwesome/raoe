@@ -11,6 +11,8 @@ raoe_add_cog(
     DEPENDENCIES
         PUBLIC
             imgui
+        PRIVATE
+            rapidfuzz::rapidfuzz
     GEARS
         "ConsoleGear"
 )

@@ -38,6 +38,7 @@ namespace RAOE::Console
         std::vector<std::string> history;
     private:
         std::shared_ptr<spdlog::sinks::ringbuffer_sink_mt> ring_buffer;
+        std::string input_buffer;
 
     };
 }
