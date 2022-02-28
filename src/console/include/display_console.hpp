@@ -16,7 +16,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
+#include "core.hpp"
 #include <string>
+#include "spdlog/sinks/ringbuffer_sink.h"
 
 namespace RAOE::Console
 {
@@ -24,9 +26,18 @@ namespace RAOE::Console
     {
     public:
         DisplayConsole();
+        ~DisplayConsole();
 
-        virtual void Draw(std::string title, bool* p_open);
+        void Draw(std::string title, bool* p_open);
 
         void ExecCommand(const std::string& command_line);
+
+        //TODO: Module level protection
+    //INTERNAL:
+        int32 history_pos;        
+        std::vector<std::string> history;
+    private:
+        std::shared_ptr<spdlog::sinks::ringbuffer_sink_mt> ring_buffer;
+
     };
 }

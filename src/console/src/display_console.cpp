@@ -24,9 +24,20 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Console
 {
+    const int32 Max_History = 32;
+
     DisplayConsole::DisplayConsole()
     {
-        
+        ring_buffer = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(40);
+        spdlog::default_logger()->sinks().push_back(ring_buffer);
+
+        history.reserve(Max_History);
+        history_pos = -1;
+    }
+
+    DisplayConsole::~DisplayConsole()    
+    {
+        //Remove the ring buffer sink
     }
 
     void DisplayConsole::Draw(std::string title, bool* p_open)
@@ -62,17 +73,12 @@ namespace RAOE::Console
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
-        for(int i = 0; i < 100; i++)
+        std::vector<std::string> log_messages = ring_buffer->last_formatted(40);
+        for(const std::string& str : log_messages)
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 1, 1));
-            ImGui::TextUnformatted("[Info] ");
-            ImGui::PopStyleColor();
-            ImGui::SameLine();
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 1, 1, 1));
-            ImGui::TextUnformatted(fmt::format("iteration {}", i).c_str());
-            ImGui::PopStyleColor();
+            ImGui::TextUnformatted(str.c_str());
         }
-
+       
         ImGui::PopStyleVar();
         ImGui::EndChild();
 
@@ -89,6 +95,43 @@ namespace RAOE::Console
             input_text_flags, 
             [](ImGuiInputTextCallbackData* data) -> int 
             {
+                DisplayConsole* console = static_cast<DisplayConsole*>(data->UserData);
+                switch(data->EventFlag)
+                {
+                case ImGuiInputTextFlags_CallbackHistory:
+                    const int prev_history = console->history_pos;
+                    int32& history_pos = console->history_pos;
+                    if(data->EventKey == ImGuiKey_UpArrow)
+                    {
+                        if(history_pos == -1)
+                        {
+                            history_pos = console->history.size() - 1;
+                        }
+                        else if(history_pos > 0)
+                        {
+                            history_pos--;
+                        }
+                    }
+                    else if(data->EventKey == ImGuiKey_DownArrow)
+                    {
+                        if(history_pos != -1)
+                        {
+                            if(++history_pos >= console->history.size())
+                            {
+                                history_pos = -1;
+                            }
+                        }
+                    }
+
+                    if(prev_history != history_pos)
+                    {
+                        std::string history_str = history_pos >= 0 ? console->history[history_pos] : "";
+
+                        data->DeleteChars(0, data->BufTextLen);
+                        data->InsertChars(0, history_str.c_str());
+                    }
+                break;
+                }
                 return 0;
             }
             ,(void*)this)
@@ -98,6 +141,13 @@ namespace RAOE::Console
             if(!input_buffer.empty())
             {
                 ExecCommand(input_buffer);
+
+                if(history.size() >= Max_History)
+                {
+                    history.erase(history.begin());
+                }
+                history.push_back(input_buffer);
+                history_pos = -1;
             }          
             reclaim_focus = true;
         }
