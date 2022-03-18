@@ -38,3 +38,5 @@ target_link_libraries(${PROJECT_NAME}
     spdlog)
 
 add_library(raoe::core ALIAS ${PROJECT_NAME})
+
+add_subdirectory("test")
