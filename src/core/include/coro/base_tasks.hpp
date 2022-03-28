@@ -16,21 +16,34 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include <cstdint>
-#include <type_traits>
+#include <coroutine>
+#include <memory>
+#include "coro/task_shared.hpp"
+#include "coro/task.hpp"
+#include "types.hpp"
 
-using uint8 = uint8_t;  
-using uint16 = uint16_t;   
-using uint32 = uint32_t;  
-using uint64 = uint64_t;   
+namespace raoe::coro
+{   
+    inline task<> wait_until(TaskReadyFunc ready_func)
+    {
+        co_await ready_func;
+    }
 
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
+    inline task<> wait_while(TaskReadyFunc ready_func)
+    {
+        co_await [&ready_func]() {return !ready_func(); };
+    }
 
-namespace raoe
-{
-    template<typename T>
-    struct static_false : std::false_type {};
+    inline task<> wait_forever()
+    {
+        return wait_until([]() { return false; });
+    }
+
+    inline task<> wait_count(int32 count)
+    {
+        for(int i = 0; i < count; i++)
+        {
+            co_await std::suspend_always();
+        }
+    }
 }

@@ -13,24 +13,13 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 #pragma once
 
-#include <cstdint>
-#include <type_traits>
 
-using uint8 = uint8_t;  
-using uint16 = uint16_t;   
-using uint32 = uint32_t;  
-using uint64 = uint64_t;   
-
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
-
-namespace raoe
-{
-    template<typename T>
-    struct static_false : std::false_type {};
-}
+#include "coro/task_shared.hpp"
+#include "coro/awaiters.hpp"
+#include "coro/promise.hpp"
+#include "coro/task_private.hpp"
+#include "coro/task_shared.hpp"
+#include "coro/task.hpp"
+#include "coro/base_tasks.hpp"

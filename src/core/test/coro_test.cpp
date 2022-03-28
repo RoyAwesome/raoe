@@ -14,23 +14,31 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
+#include <gtest/gtest.h>
 
-#include <cstdint>
-#include <type_traits>
+#include "coro/coro.hpp"
 
-using uint8 = uint8_t;  
-using uint16 = uint16_t;   
-using uint32 = uint32_t;  
-using uint64 = uint64_t;   
-
-using int8 = int8_t;
-using int16 = int16_t;
-using int32 = int32_t;
-using int64 = int64_t;
-
-namespace raoe
+TEST(CoroTest, InitialTest)
 {
-    template<typename T>
-    struct static_false : std::false_type {};
+    raoe::coro::promise<int> p;
+
+    raoe::coro::task<void> task_v;
+    raoe::coro::task<int> task_t;
+}
+
+TEST(CoroTest, Counter)
+{
+    auto l = []() -> raoe::coro::task<> {
+        for(int i = 0; i < 10; i++)
+        {
+            std::cout<< i << std::endl;
+            co_await std::suspend_always();
+        }
+    };
+
+    auto task = l();
+    while(!task.is_done())
+    {
+        task.resume();
+    }
 }
