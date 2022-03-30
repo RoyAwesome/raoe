@@ -13,13 +13,21 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#pragma once
 
-#include "enum.hpp"
-#include "types.hpp"
-#include "typename.hpp"
-#include "debug.hpp"
-#include "inline.hpp"
-#include "const_math.hpp"
-#include "time.hpp"
+#include <functional>
 
+namespace raoe::core::time
+{
+#if USE_DOUBLE_PRECISION_TIME
+    using time_s = double;
+#else 
+    using time_s = float;
+#endif
+
+    using time_func = std::function<time_s()>;
+
+    time_s time_since(time_s in_t, time_func time_func)
+    {
+        return time_func() - in_t;
+    }
+}

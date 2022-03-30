@@ -21,10 +21,10 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <type_traits>
 #include "coro/task_shared.hpp"
 #include "coro/task_private.hpp"
-#include "coro/promise.hpp"
 
 namespace raoe::coro
-{
+{   
+
     template<typename ReturnType = void, ETaskRef RefType = ETaskRef::Strong, ETaskResumable ResumableType = ETaskResumable::Yes>
     class task
     {
@@ -94,7 +94,7 @@ namespace raoe::coro
         bool is_valid() const { return _private_task.get(); }
         operator bool() const{ return is_valid(); }
         bool is_done() const { return is_valid() ? private_task()->done() : true; }
-        bool is_stop_requested() const { is_valid() ? private_task->stop_requested : true; }
+        bool is_stop_requested() const { return is_valid() ? private_task()->stop_requested() : true; }
         static constexpr bool is_resumable() { return ResumableType == ETaskResumable::Yes; }
         static constexpr bool is_strong() { return RefType == ETaskRef::Strong; }
         static constexpr bool is_copyable() { return !is_resumable(); }
@@ -124,6 +124,7 @@ namespace raoe::coro
             {
                 return private_task()->take_return_value();
             }
+            return {};
         }
 
         ETaskStatus resume()
@@ -190,13 +191,16 @@ namespace raoe::coro
             return copy_to_task<void, ETaskRef::Weak, ETaskResumable::No>();
         }
 
+        auto cancel_if(TaskCancelFunc cancel_func) &&
+        {
+            return 
+        }
 
 
 
-    private:
         friend class _::task_private_base;
-        template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType, typename promise_type> friend struct task_awaiter_base;
-
+        template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType, typename awaiter_promise_type> friend struct await::_::task_awaiter_base;
+    private:
         std::shared_ptr<_::task_private_base> _private_task;
 
         std::shared_ptr<task_private> private_task() const { return std::static_pointer_cast<task_private>(_private_task); }

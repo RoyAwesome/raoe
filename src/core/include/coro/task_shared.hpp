@@ -20,11 +20,6 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace raoe::coro
 {
-    inline namespace _
-    {
-        class task_private_base;
-    }
-
     enum class ETaskRef
     {
         Strong,
@@ -43,7 +38,21 @@ namespace raoe::coro
         Done,
     };
 
+   
+    inline namespace _
+    {
+        class task_private_base;
+        
+    }
+    namespace await
+    {
+        inline namespace _
+        {
+            template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType, typename promise_type> struct task_awaiter_base;
+        }        
+    }
 
+    template<typename ReturnType> struct promise;
     template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumableType> class task;    
     template<typename ReturnType = void>
     using task_handle = task<ReturnType, ETaskRef::Strong, ETaskResumable::No>;
@@ -51,6 +60,7 @@ namespace raoe::coro
     using weak_task_handle = task<void, ETaskRef::Weak, ETaskResumable::No>;
 
     using TaskReadyFunc = std::function<bool()>;
+    using TaskCancelFunc = std::function<bool()>;
 
     struct stop_context
     {

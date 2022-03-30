@@ -20,6 +20,5 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "coro/awaiters.hpp"
 #include "coro/promise.hpp"
 #include "coro/task_private.hpp"
-#include "coro/task_shared.hpp"
 #include "coro/task.hpp"
 #include "coro/base_tasks.hpp"

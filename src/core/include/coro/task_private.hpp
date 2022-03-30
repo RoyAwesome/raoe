@@ -21,7 +21,6 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <optional>
 #include "types.hpp"
 #include "coro/task_shared.hpp"
-#include "coro/promise.hpp"
 #include "debug.hpp"
 
 namespace raoe::coro
@@ -55,6 +54,36 @@ namespace raoe::coro
                     }
                 }
                 stop_tasks.clear();
+            }
+
+            template<typename ReturnValue, ETaskRef RefType, ETaskResumable ResumeType>
+            void add_stop_task(task<ReturnValue, RefType, ResumeType>& in_task)
+            {
+                if(is_stop_requested)
+                {
+                    in_task.request_stop();
+                }
+                else if(in_task.is_valid())
+                {
+                    stop_tasks.push_back(in_task.private_task());
+                }
+            }
+
+            template<typename ReturnValue, ETaskRef RefType, ETaskResumable ResumeType>
+            void remove_stop_task(task<ReturnValue, RefType, ResumeType>& in_task)
+            {
+                if(in_task.is_valid())
+                {
+                    for(size_t i = 0; i < stop_tasks.size(); i++)
+                    {
+                        if(stop_tasks[i].lock() == in_task.private_task())
+                        {
+                            stop_tasks[i] = stop_tasks.back();
+                            stop_tasks.pop_back();
+                            return;
+                        }
+                    }
+                }
             }
 
             ETaskStatus resume()

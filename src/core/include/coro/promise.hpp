@@ -130,30 +130,56 @@ namespace raoe::coro
                 {
                     task->set_ready_func(task_ready);
                 }
-                return suspend_if(!is_ready);
+                return await::suspend_if(!is_ready);
             }
 
             template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType,
                 typename std::enable_if_t<ResumeType == ETaskResumable::Yes>* = nullptr>
             auto await_transform(task<ReturnType, RefType, ResumeType>&& in_task)
             {
-                return task_awaiter<ReturnType, RefType, ResumeType, promise_type>(std::move(in_task));
+                return await::task_awaiter<ReturnType, RefType, ResumeType, promise_type>(std::move(in_task));
             }
 
             template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType,
                 typename std::enable_if_t<ResumeType == ETaskResumable::No>* = nullptr>
             auto await_transform(task<ReturnType, RefType, ResumeType> in_task)
             {
-                return task_awaiter<ReturnType, RefType, ResumeType, promise_type>(std::move(in_task));
+                return await::task_awaiter<ReturnType, RefType, ResumeType, promise_type>(std::move(in_task));
             }
             template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType,
                 typename std::enable_if_t<ResumeType == ETaskResumable::No>* = nullptr>
             auto await_transform(const task<ReturnType, RefType, ResumeType>& in_task)
             {
                 static_assert(raoe::static_false<ReturnType>::value, "Cannot await a non-copyable (resumable) task by copy.  try co_await std::move(task), co_await weak_task_handle(task), or co_await task.wait_until_done()");
-                return task_awaiter<ReturnType, RefType, ResumeType, promise_type>(std::move(in_task));
+                return await::task_awaiter<ReturnType, RefType, ResumeType, promise_type>(std::move(in_task));
             }
-        private:
+
+            template<typename InnerReturnType, ETaskRef RefType, ETaskResumable ResumeType>
+            auto await_transform(await::add_stop_task_awaiter<InnerReturnType, RefType, ResumeType> in_awaiter)
+            {
+                task->add_stop_task(*in_awaiter.task_to_stop);
+                return std::suspend_never();
+            }
+            template<typename InnerReturnType, ETaskRef RefType, ETaskResumable ResumeType>
+            auto await_transform(await::remove_stop_task_awaiter<InnerReturnType, RefType, ResumeType> in_awaiter)
+            {
+                task->remove_stop_task(*in_awaiter.task_to_stop);
+                return std::suspend_never();
+            }
+
+            template<typename FutureReturnType>
+            auto await_transform(std::future<FutureReturnType>&& in_future)
+            {
+                return await::future_awaiter<FutureReturnType, promise_type>(std::move(in_future));
+            }
+
+            template<typename FutureReturnType>
+            auto await_transform(const std::shared_future<FutureReturnType>& in_future)
+            {
+                return await::shared_future_awaiter<FutureReturnType, promise_type>(std::move(in_future));
+            }
+            
+        protected:
             internal_task* task = nullptr;
         };
     }
