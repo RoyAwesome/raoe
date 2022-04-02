@@ -42,3 +42,44 @@ TEST(CoroTest, Counter)
         task.resume();
     }
 }
+
+TEST(CoroTest, Cancel)
+{
+     auto l = []() -> raoe::coro::task<> {
+        for(int i = 0; i < 10; i++)
+        {
+            std::cout<< i << std::endl;
+            co_await std::suspend_always();
+        }
+    };
+
+    int32 i = 0;
+    auto task = l().cancel_if([&i] {return i >= 5; });
+
+    while(!task.is_done())
+    {
+        task.resume();
+        i++;        
+    }
+}
+
+TEST(CoroTest, StopIf)
+{
+    auto l = []() -> raoe::coro::task<> {
+        for(int i = 0; i < 10; i++)
+        {
+            std::cout<< i;
+            co_await std::suspend_always();
+        }
+    };
+
+    int32 i = 0;
+    auto task = l().stop_if([&i] {return i >= 5; });
+
+    while(!task.is_done())
+    {
+        task.resume();
+        i++;    
+        std::cout << " Stop Requested: " << task.is_stop_requested() << std::endl;    
+    }
+}

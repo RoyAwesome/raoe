@@ -21,9 +21,20 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <type_traits>
 #include "coro/task_shared.hpp"
 #include "coro/task_private.hpp"
+#include "time.hpp"
 
 namespace raoe::coro
 {   
+
+    template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType>
+    auto cancel_task_if(task<ReturnType, RefType, ResumeType>&& in_task, TaskCancelFunc in_cancel_func);
+
+    template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType>
+    auto stop_task_if(task<ReturnType, RefType, ResumeType>&& in_task, TaskCancelFunc cancel_func);
+
+    template<typename ReturnType, ETaskRef RefType, ETaskResumable ResumeType>
+    auto stop_task_if(task<ReturnType, RefType, ResumeType>&& in_task, TaskCancelFunc cancel_func,
+        raoe::core::time::time_s time, raoe::core::time::time_func time_func);
 
     template<typename ReturnType = void, ETaskRef RefType = ETaskRef::Strong, ETaskResumable ResumableType = ETaskResumable::Yes>
     class task
@@ -193,7 +204,43 @@ namespace raoe::coro
 
         auto cancel_if(TaskCancelFunc cancel_func) &&
         {
-            return 
+            return cancel_task_if(std::move(*this), cancel_func);
+        }
+        auto cancel_if_stop_requested() &&
+        {
+            return std::move(*this).cancel_if([]{return is_stop_requested(); });
+        }
+        auto cancel_if(TaskCancelFunc cancel_func) &
+        {
+            static_assert(static_false<ReturnType>::value, "Cannot call cancel_if() on a lvalue (try std::move(task).cancel_if())");
+            return cancel_task_if(std::move(*this), cancel_func);
+        }
+        auto cancel_if_stop_requested() & 
+        {
+            static_assert(static_false<ReturnType>::value, "Cannot call cancel_if_stop_requested() on a lvalue (try std::move(task).cancel_if())");            
+            return std::move(*this).cancel_if([]{return is_stop_requested(); });
+        }
+
+        auto stop_if(TaskCancelFunc cancel_func) &&
+        {
+            return stop_task_if(std::move(*this), cancel_func);
+        }
+
+        auto stop_if(TaskCancelFunc cancel_func) &
+        {
+            static_assert(static_false<ReturnType>::value, "Cannot call stop_if on lvalue (try std::move(task).stop_if())");
+            return stop_task_if(std::move(*this), cancel_func);
+        }
+
+        auto stop_if(TaskCancelFunc cancel_func, raoe::core::time::time_s time, raoe::core::time::time_func time_func) &&
+        {
+            return stop_task_if(std::move(*this), cancel_func, time, time_func);
+        }
+
+        auto stop_if(TaskCancelFunc cancel_func, raoe::core::time::time_s time, raoe::core::time::time_func time_func) &
+        {
+            static_assert(static_false<ReturnType>::value, "Cannot call stop_if on lvalue (try std::move(task).stop_if())");
+            return stop_task_if(std::move(*this), cancel_func, time, time_func);
         }
 
 
@@ -247,7 +294,8 @@ namespace raoe::coro
             _private_task = nullptr;
             return ret;
         }
-
-
     };
+
+
+
 }

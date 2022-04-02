@@ -13,6 +13,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#pragma once
 
 #include <functional>
 
