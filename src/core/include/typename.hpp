@@ -88,4 +88,11 @@ namespace raoe::core
         constexpr auto& value = type_name_holder<T>::value;
         return trim_whitespace(std::string_view{value.data(), value.size()});
     }
+
+    template<typename R, typename... Args>
+    constexpr int count_args(R(*func)(Args...))
+    {
+        return sizeof...(Args);
+    }
+
 }

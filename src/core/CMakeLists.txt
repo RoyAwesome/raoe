@@ -35,7 +35,9 @@ CPMAddPackage("gh:gabime/spdlog#v1.9.2")
 
 target_link_libraries(${PROJECT_NAME} 
     INTERFACE
-    spdlog)
+    spdlog
+    tl::expected
+  )
 
 add_library(raoe::core ALIAS ${PROJECT_NAME})
 
