@@ -31,47 +31,30 @@ namespace RAOE::Console
     {
         return registry_singleton().value();
     }
-
-    AutoRegisterConsoleCommand CreateConsoleCommand(std::string_view name,
-        std::string_view description,
-        std::function<CommandFunctor> functor, 
-        EConsoleFlags flags
-    )
-    {
-        Command* cmd = static_cast<Command*>(CommandRegistry::Get().register_console_element([=]() -> IConsoleElement*
-            {
-                return new Command(
-                    name,
-                    description,
-                    functor,
-                    flags
-                );
-            }           
-        ));
-
-        return AutoRegisterConsoleCommand(cmd);
-    }
-
+  
     IConsoleElement* CommandRegistry::register_console_element(std::function<IConsoleElement*()> factory)    
     {
         std::unique_ptr<IConsoleElement>& element = element_registry.emplace_back(std::unique_ptr<IConsoleElement>(factory()));
         return element.get();
     }
 
+    std::tuple<std::string_view, std::string_view> split_command_args(std::string_view command_line)
+    {
+        const std::string_view start = raoe::string::token(command_line, " ");
+        return { start, command_line.substr(start.length())};
+    }
+
     EConsoleError execute(std::string_view command_line)    
     {
-        //Parse this command into the it's constituent parts
-        std::vector<std::string> elements;
-        raoe::core::split(std::string(command_line), ' ', std::back_inserter(elements));
-
-        CommandArgs args;
-
+        //split this command into it's name and args
+        auto [command, args] = split_command_args(command_line);
+     
         IConsoleElement* found_element = nullptr;
 
         //Find the console command this matches
         for(auto& element : RAOE::Console::CommandRegistry::Get().elements())
         {
-            if(element && element->name().compare(elements[0]) == 0)
+            if(element && element->name().compare(command) == 0)
             {
                 found_element = element.get();
                 break;                

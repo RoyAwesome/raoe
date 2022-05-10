@@ -98,11 +98,10 @@ namespace RAOE
     }
 
     using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
-    using CommandArgs = RAOE::Console::CommandArgs;
     static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
         "quit",
         "Exits the game",
-        [](const CommandArgs& args) {
+        []() {
             Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
             if(engine_gear != nullptr)
             {
@@ -114,9 +113,19 @@ namespace RAOE
     static AutoRegisterConsoleCommand log_command = RAOE::Console::CreateConsoleCommand(
         "log",
         "prints the arguments to the log",
-        [](const CommandArgs& args) {
-            spdlog::info(args.args_as_string);
+        [](std::string_view args) {
+            spdlog::info(args);
         }
+    );
+
+    void foo(int32 a, int32 b, std::string c) {
+            spdlog::info("fooo {} {} {}", a, b, c);
+        }
+
+    static AutoRegisterConsoleCommand test_comamnd = RAOE::Console::CreateConsoleCommandWithArgs(
+        "test_args",
+        "prints the arguments to the log",
+        foo
     );
 
     Engine& Engine::Init(int32 argc, char* argv[])

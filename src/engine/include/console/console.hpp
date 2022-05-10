@@ -33,12 +33,6 @@ namespace RAOE::Console
 
     };
 
-    struct CommandArgs
-    {
-        std::vector<std::string> args;
-        std::string args_as_string;
-    };
-
     class IConsoleElement
     {
     public:
@@ -53,7 +47,7 @@ namespace RAOE::Console
             Command_Error
         };
 
-        virtual EExecuteError execute(const CommandArgs& args) const = 0;
+        virtual EExecuteError execute(std::string_view command_line) const = 0;
     };
 
     struct AutoRegisterConsoleElement

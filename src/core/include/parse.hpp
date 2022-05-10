@@ -83,7 +83,9 @@ namespace raoe::core::parse
                 }             
 
                 //substring from start to cursor, add it to the out iterator   
-                *out_itr++ = from.substr(start, cursor - start);   
+                *out_itr++ = from.substr(start, cursor - start);  
+
+                 
             }  
         }
 
@@ -107,9 +109,6 @@ namespace raoe::core::parse
             {
                 elems.push_back(std::string_view());
             }
-
-            //Get rid of the command
-            elems.erase(elems.begin());
 
             return { from_string(elems[I], std::get<I>(value))... };
         }   

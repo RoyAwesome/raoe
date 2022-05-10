@@ -27,7 +27,7 @@ namespace raoe::core::time
 
     using time_func = std::function<time_s()>;
 
-    time_s time_since(time_s in_t, time_func time_func)
+    inline time_s time_since(time_s in_t, time_func time_func)
     {
         return time_func() - in_t;
     }

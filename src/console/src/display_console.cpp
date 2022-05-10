@@ -138,7 +138,7 @@ namespace RAOE::Console
             ,(void*)this)
         )
         {
-            raoe::core::trim(input_buffer);
+            raoe::string::trim(input_buffer);
             if(!input_buffer.empty())
             {
                 ExecCommand(input_buffer);

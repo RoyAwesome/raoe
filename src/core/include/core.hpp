@@ -22,4 +22,5 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "inline.hpp"
 #include "const_math.hpp"
 #include "time.hpp"
+#include "string.hpp"
 

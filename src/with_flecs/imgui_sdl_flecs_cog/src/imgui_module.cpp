@@ -113,11 +113,10 @@ namespace RAOE::ECS::Imgui
     }  
 
     using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
-    using CommandArgs = RAOE::Console::CommandArgs;
     static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
         "ShowDemo",
         "Shows the Demo Window",
-        [](const CommandArgs& args) {
+        []() {
             using FlecsGear = RAOE::Gears::FlecsGear;
             FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
             if(flecs_gear)

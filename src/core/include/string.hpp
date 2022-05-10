@@ -14,14 +14,17 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+#pragma once
+
 #include <algorithm>
 #include <locale>
 #include <cctype>
 #include <sstream>
 #include <iterator>
 #include <vector>
+#include <iterator>
 
-namespace raoe::core
+namespace raoe::string
 {    
     //Left Trim a string, inline.  Removes all whitespace characters from the left side of the string, modifying it in place
     static inline void ltrim(std::string& s)
@@ -71,8 +74,8 @@ namespace raoe::core
         ltrim(s);
         return s;
     }
-    template<typename Out>
-    static inline void split(const std::string& s, char delim, Out result)
+
+    static inline void split(const std::string& s, char delim, std::output_iterator<std::string> auto out_itr)
     {
         std::istringstream iss(s);
         std::string item;
@@ -80,7 +83,7 @@ namespace raoe::core
         {
             if(!item.empty())
             {
-                *result++ = item;
+                *out_itr++ = item;
             }
         }
     }
@@ -90,5 +93,50 @@ namespace raoe::core
         std::vector<std::string> elems;
         split(s, delim, std::back_inserter(elems));
         return elems;
+    }
+
+    inline std::string_view trim_l(std::string_view s)
+    {
+        return s.substr(s.find_first_not_of(' '));
+    }
+
+    inline std::string_view trim_r(std::string_view s)
+    {
+        return s.substr(0, s.find_last_not_of(' ') + 1);
+    }
+
+    inline std::string_view trim(std::string_view s)
+    {
+        return trim_r(trim_l(s));
+    }
+
+    inline void split(std::string_view sv, std::string_view delimiter, std::output_iterator<std::string_view> auto out_itr)
+    {
+        size_t start = 0;
+        size_t cursor = start;
+        while(cursor != sv.length())
+        {           
+            while(cursor != sv.length() && sv.substr(cursor, delimiter.length()).compare(delimiter) != 0)
+            {
+                cursor++;
+            }
+            
+           
+            using namespace std::literals::string_view_literals;
+            *out_itr++ = sv.substr(start, cursor - start);
+
+            if(cursor == sv.length())
+            {
+                return;
+            }
+
+            cursor++;
+            start = cursor;
+        }
+    }
+
+    inline std::string_view token(std::string_view sv, std::string_view token)
+    {
+        return sv.substr(0, sv.find_first_of(token));
     }
 }
