@@ -92,5 +92,4 @@ TEST(CommandFuncTest, console_command_struct)
     EXPECT_EQ(command->num_args(), 3);
 
     EXPECT_EQ(command->execute("foo 12 3.14 booyah"), true);
-
 }

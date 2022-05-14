@@ -17,10 +17,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "enum.hpp"
 #include "types.hpp"
-#include "typename.hpp"
+
 #include "debug.hpp"
 #include "inline.hpp"
 #include "const_math.hpp"
 #include "time.hpp"
 #include "string.hpp"
 
+#include "typeinfo/typename.hpp"

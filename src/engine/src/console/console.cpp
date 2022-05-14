@@ -22,7 +22,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Console
 {
-     static std::optional<CommandRegistry>& registry_singleton()
+    static std::optional<CommandRegistry>& registry_singleton()
     {
         static std::optional<CommandRegistry> singleton(std::in_place);
         return singleton;
