@@ -20,17 +20,24 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <string>
 #include "spdlog/sinks/ringbuffer_sink.h"
 
+namespace RAOE
+{
+    class Engine;
+}
+
 namespace RAOE::Console
 {
     class DisplayConsole
     {
     public:
-        DisplayConsole();
+        DisplayConsole(RAOE::Engine&);
         ~DisplayConsole();
 
         void Draw(std::string title, bool* p_open);
 
         void ExecCommand(const std::string& command_line);
+
+        RAOE::Engine& engine() { return m_engine; }
 
         //TODO: Module level protection
     //INTERNAL:
@@ -40,5 +47,6 @@ namespace RAOE::Console
         std::shared_ptr<spdlog::sinks::ringbuffer_sink_mt> ring_buffer;
         std::string input_buffer;
 
+        RAOE::Engine& m_engine;
     };
 }

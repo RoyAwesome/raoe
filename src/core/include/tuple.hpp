@@ -13,17 +13,16 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+
 #pragma once
+#include <tuple>
+#include <type_traits>
 
-#include "core_minimal.hpp"
+namespace raoe
+{
+    template<std::size_t N, typename... T, std::size_t... I>
+    std::tuple<std::tuple_element_t<N+I, std::tuple<T...>>...> sub(std::index_sequence<I...>);
 
-#include "enum.hpp"
-
-#include "inline.hpp"
-#include "const_math.hpp"
-#include "time.hpp"
-#include "string.hpp"
-#include "tuple.hpp"
-
-#include "typeinfo/typename.hpp"
-
+    template<std::size_t N, typename... T>
+    using subpack = decltype(sub<N, T...>(std::make_index_sequence<sizeof...(T) - N>{}));
+}

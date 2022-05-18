@@ -22,6 +22,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <functional>
 #include <vector>
 
+namespace RAOE
+{
+    class Engine;
+}
+
 namespace RAOE::Console
 {
     enum class EConsoleFlags
@@ -47,7 +52,7 @@ namespace RAOE::Console
             Command_Error
         };
 
-        virtual EExecuteError execute(std::string_view command_line) const = 0;
+        virtual EExecuteError execute(RAOE::Engine& engine, std::string_view command_line)  const = 0;
     };
 
     struct AutoRegisterConsoleElement
@@ -87,5 +92,5 @@ namespace RAOE::Console
         Need_Cheats,
     };
 
-    EConsoleError execute(std::string_view command_line);
+    EConsoleError execute(RAOE::Engine& engine, std::string_view command_line);
 }

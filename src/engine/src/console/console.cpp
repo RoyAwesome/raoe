@@ -44,7 +44,7 @@ namespace RAOE::Console
         return { start, command_line.substr(start.length())};
     }
 
-    EConsoleError execute(std::string_view command_line)    
+    EConsoleError execute(RAOE::Engine& engine, std::string_view command_line)    
     {
         //split this command into it's name and args
         auto [command, args] = split_command_args(command_line);
@@ -63,7 +63,7 @@ namespace RAOE::Console
 
         if(found_element)
         {
-            if(IConsoleElement::EExecuteError error = found_element->execute(args); error != IConsoleElement::EExecuteError::Success )
+            if(IConsoleElement::EExecuteError error = found_element->execute(engine, args); error != IConsoleElement::EExecuteError::Success )
             {
                 return EConsoleError::Incorrect_Arguments;
             }

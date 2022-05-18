@@ -15,6 +15,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include "display_console.hpp"
+#include "engine.hpp"
 #include "imgui.h"
 #include "spdlog/spdlog.h"
 #include "misc/cpp/imgui_stdlib.h"
@@ -28,7 +29,8 @@ namespace RAOE::Console
 {
     const int32 Max_History = 32;
 
-    DisplayConsole::DisplayConsole()
+    DisplayConsole::DisplayConsole(RAOE::Engine& in_engine)
+        : m_engine(in_engine)
     {
         ring_buffer = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(40);
         spdlog::default_logger()->sinks().push_back(ring_buffer);
@@ -243,7 +245,7 @@ namespace RAOE::Console
     {
         spdlog::info("> {}", command_line);
 
-        if(RAOE::Console::EConsoleError err = RAOE::Console::execute(command_line); err != RAOE::Console::EConsoleError::None)
+        if(RAOE::Console::EConsoleError err = RAOE::Console::execute(engine(), command_line); err != RAOE::Console::EConsoleError::None)
         {
             switch(err)
             {

@@ -23,7 +23,7 @@ namespace RAOE::Gears
     const std::string ConsoleGearName("Global::Console::ConsoleGear");
     ConsoleGear::ConsoleGear(RAOE::Cogs::BaseCog& in_cog)    
         : RAOE::Cogs::Gear(in_cog)
-        , console_ptr(std::make_unique<RAOE::Console::DisplayConsole>())
+        , console_ptr(std::make_unique<RAOE::Console::DisplayConsole>(in_cog.engine()))
     {
     
     }

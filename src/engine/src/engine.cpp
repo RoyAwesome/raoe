@@ -91,20 +91,15 @@ namespace RAOE
     static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
         "quit",
         "Exits the game",
-        []() {
-            /*Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
-            if(engine_gear != nullptr)
-            {
-                engine_gear->request_exit();
-            }
-            */
+        +[](Engine& engine) {
+            engine.get_service<RAOE::Service::TickService>()->request_exit();
         }
     );
 
     static AutoRegisterConsoleCommand log_command = RAOE::Console::CreateConsoleCommand(
         "log",
         "prints the arguments to the log",
-        [](std::string_view args) {
+        +[](std::string_view args) {
             spdlog::info(args);
         }
     );
@@ -113,7 +108,7 @@ namespace RAOE
             spdlog::info("fooo {} {} {}", a, b, c);
         }
 
-    static AutoRegisterConsoleCommand test_comamnd = RAOE::Console::CreateConsoleCommandWithArgs(
+    static AutoRegisterConsoleCommand test_comamnd = RAOE::Console::CreateConsoleCommand(
         "test_args",
         "prints the arguments to the log",
         foo

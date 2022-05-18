@@ -118,16 +118,14 @@ namespace RAOE::ECS::Imgui
     static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
         "ShowDemo",
         "Shows the Demo Window",
-        []() {
-            /*
+        +[](RAOE::Engine& e) {            
             using FlecsGear = RAOE::Gears::FlecsGear;
-            FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
+            FlecsGear* flecs_gear = e.get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
             if(flecs_gear)
             {
                 bool& should_show_menu = flecs_gear->ecs_world_client->module<Module>().get_mut<ImCmdInfo>()->should_show_demo_window;
                 should_show_menu = !should_show_menu;
-            }
-            */
+            }            
         }
     );
 

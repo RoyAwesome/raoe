@@ -23,6 +23,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "from_string.hpp"
 #include "parse.hpp"
 
+namespace RAOE
+{
+    class Engine;
+}
+
 namespace RAOE::Console
 {
     class BaseCommand : public IConsoleElement
@@ -44,61 +49,10 @@ namespace RAOE::Console
         virtual std::string_view name() const override { return m_name; }
         virtual std::string_view description() const override { return m_description; }
         virtual EConsoleFlags flags() const override { return m_flags; }
-        virtual EExecuteError execute(std::string_view command_line) const = 0;
 
         std::string m_name;
         std::string m_description;
         EConsoleFlags m_flags;
-    };
-
-    class ConsoleCommandNoArgs : public BaseCommand
-    {
-    public:
-        ConsoleCommandNoArgs() = delete; //Cannot construct a default console command
-
-        ConsoleCommandNoArgs(
-            std::string_view in_command_name, 
-            std::string_view in_description, 
-            std::function<void()> in_functor, 
-            EConsoleFlags in_flags = EConsoleFlags::None
-        )
-            : BaseCommand(in_command_name, in_description, in_flags)
-            , functor(in_functor)
-        {
-        }
-
-        virtual EExecuteError execute(std::string_view command_line) const
-        {
-            functor();
-            return EExecuteError::Success;
-        }
-    private:
-        std::function<void()> functor;
-    };
-
-    class ConsoleCommandAllArgs : public BaseCommand
-    {
-    public:
-        ConsoleCommandAllArgs() = delete; //Cannot construct a default console command
-
-        ConsoleCommandAllArgs(
-            std::string_view in_command_name, 
-            std::string_view in_description, 
-            std::function<void(std::string_view)> in_functor, 
-            EConsoleFlags in_flags = EConsoleFlags::None
-        )
-            : BaseCommand(in_command_name, in_description, in_flags)
-            , functor(in_functor)
-        {
-        }
-
-        virtual EExecuteError execute(std::string_view command_line) const
-        {
-            functor(command_line);
-            return EExecuteError::Success;
-        }
-    private:
-        std::function<void(std::string_view)> functor;
     };
 
     template<typename... Args>
@@ -110,7 +64,7 @@ namespace RAOE::Console
         ConsoleCommandWithArgs(
             std::string_view in_command_name, 
             std::string_view in_description, 
-            std::function<void(Args...)> in_functor, 
+            void(*in_functor)(Args...), 
             EConsoleFlags in_flags = EConsoleFlags::None
         )
             : BaseCommand(in_command_name, in_description, in_flags)
@@ -118,12 +72,37 @@ namespace RAOE::Console
         {
         }
 
-        virtual EExecuteError execute(std::string_view command_line) const
+        virtual EExecuteError execute(RAOE::Engine& engine, std::string_view command_line) const
         {
-            std::tuple<Args...> parsed_arguments = raoe::core::parse::parse_tuple<Args...>(command_line);       
-            std::apply(functor, parsed_arguments);
+            if constexpr (requires () { functor(); })
+            {
+                functor();                
+                return EExecuteError::Success;
+            }
+            else if constexpr (requires (RAOE::Engine& e) { functor(e); })
+            {
+                functor(engine);
+                return EExecuteError::Success;
+            }
+            else if constexpr (requires (RAOE::Engine& e, std::string_view sv) { functor(e, sv); })
+            {
+                functor(engine, command_line);
+                return EExecuteError::Success;
+            }               
+            else if constexpr (requires(RAOE::Engine& e, Args... args) { functor(e, args...); })
+            {
+                static_assert(true, "TODO: This");
+                std::tuple<Args...> parsed_arguments = raoe::core::parse::parse_tuple<Args...>(command_line);   
+                std::tuple<std::reference_wrapper<RAOE::Engine&>, Args...> combined_args = std::tuple_cat(std::tie(engine), parsed_arguments);
+                std::apply(functor, combined_args);
+            }
+            else
+            {
+                std::tuple<Args...> parsed_arguments = raoe::core::parse::parse_tuple<Args...>(command_line);   
+                std::apply(functor, parsed_arguments);
+            }            
             return EExecuteError::Success;
-        }
+        }     
     private:
         std::function<void(Args...)> functor;
     };
@@ -139,13 +118,13 @@ namespace RAOE::Console
     };
 
     template<typename... Args>
-    AutoRegisterConsoleCommand CreateConsoleCommandWithArgs(std::string_view name,
+    AutoRegisterConsoleCommand CreateConsoleCommand(std::string_view name,
         std::string_view description,
         void(*functor)(Args...), 
         EConsoleFlags flags = EConsoleFlags::None
     )
     {
-        BaseCommand* cmd = static_cast<BaseCommand*>(CommandRegistry::Get().register_console_element([=]() -> IConsoleElement*
+        BaseCommand* cmd = dynamic_cast<BaseCommand*>(CommandRegistry::Get().register_console_element([=]() -> BaseCommand*
             {
                 return new ConsoleCommandWithArgs<Args...>(
                     name,
@@ -157,47 +136,5 @@ namespace RAOE::Console
         ));
 
         return AutoRegisterConsoleCommand(cmd);
-    }
-
-   
-    inline AutoRegisterConsoleCommand CreateConsoleCommand(std::string_view name,
-        std::string_view description,
-        void(*functor)(std::string_view), 
-        EConsoleFlags flags = EConsoleFlags::None
-    )
-    {
-        BaseCommand* cmd = static_cast<BaseCommand*>(CommandRegistry::Get().register_console_element([=]() -> IConsoleElement*
-            {
-                return new ConsoleCommandAllArgs(
-                    name,
-                    description,
-                    functor,
-                    flags
-                );
-            }           
-        ));
-
-        return AutoRegisterConsoleCommand(cmd);
-    }
-
-
-    inline AutoRegisterConsoleCommand CreateConsoleCommand(std::string_view name,
-        std::string_view description,
-        std::function<void()> functor, 
-        EConsoleFlags flags = EConsoleFlags::None
-    )
-    {
-        BaseCommand* cmd = static_cast<BaseCommand*>(CommandRegistry::Get().register_console_element([=]() -> IConsoleElement*
-            {
-                return new ConsoleCommandNoArgs(
-                    name,
-                    description,
-                    functor,
-                    flags
-                );
-            }           
-        ));
-
-        return AutoRegisterConsoleCommand(cmd);
-    }
+    }      
 }
