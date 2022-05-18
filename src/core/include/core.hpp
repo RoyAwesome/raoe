@@ -15,13 +15,14 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 #pragma once
 
-#include "enum.hpp"
-#include "types.hpp"
+#include "core_minimal.hpp"
 
-#include "debug.hpp"
+#include "enum.hpp"
+
 #include "inline.hpp"
 #include "const_math.hpp"
 #include "time.hpp"
 #include "string.hpp"
 
 #include "typeinfo/typename.hpp"
+

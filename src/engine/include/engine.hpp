@@ -14,63 +14,66 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+#pragma once
+
+
 #include <functional>
 #include "core.hpp"
-#include "cogs/gear.hpp"
-
-#pragma once
+#include "services/iservice.hpp"
+#include "container/subclass_map.hpp"
 
 int main(int, char**);
 
 namespace RAOE
 {
+    class Engine;
+
+    template<typename T>
+    concept has_engine_ref = std::constructible_from<T, RAOE::Engine&> && requires(T t) 
+    {
+        { t.engine() } -> std::same_as<RAOE::Engine&>;
+    };
+
+    template<typename Service>
+    concept is_service = std::derived_from<Service, RAOE::Service::IService> && has_engine_ref<Service>;
+
     class Engine
     {     
+    public: 
+        Engine() = delete;
+        Engine(const Engine&) = delete;
+        Engine(Engine&&) = delete;
+
+        ~Engine();
     protected:
+        Engine(int argv, char** argc);
         //Main calls Init and Run (but nobody else can).  So it's friend.  
         friend int ::main(int, char**);
         friend class CogManager;
 
-        static Engine& Init(int32 argc, char* argv[]);
+        void Startup();
         bool Run();
         void Shutdown();
+    public:
+
+        template<is_service T>
+        T* get_service()
+        {
+            return services.find<T>();
+        }
+
+        template<is_service T>
+        T* init_service()
+        {
+            return services.insert<T>(*this);
+        }
+
+        template<is_service T>
+        void destroy_service()
+        {
+            services.erase<T>();
+        }
+    private:
+        raoe::container::subclass_map<RAOE::Service::IService> services;
     };
-
-    namespace _
-    {
-        struct EngineCog;
-    }
-    namespace Gears
-    {
-        /* Engine Gear
-            This is a special gear that represents the game engine.  It it initalized first, and is also the last to be destroyed
-            It can be accessed by "Engine::Gear"
-        */
-        extern const std::string EngineGearName;
-
-        class Engine : public RAOE::Cogs::Gear
-        {   
-        public:         
-            friend struct RAOE::_::EngineCog;
-
-            void request_exit() { exit_requested = true; }
-            bool should_exit() const { return exit_requested; }
-
-            void register_tickfunc(std::function<void()>&& tickfunc)
-            {
-                tick_funcs.emplace_back(std::move(tickfunc));
-            }
-
-            const std::vector<std::function<void()>>& tickfuncs() { return tick_funcs; }
-        private:
-            Engine()
-            {
-
-            }        
-
-            bool exit_requested = false;
-
-            std::vector<std::function<void()>> tick_funcs;
-        };       
-    }
 }

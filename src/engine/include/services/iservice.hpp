@@ -14,28 +14,35 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#include "cogs/gear.hpp"
-#include "flecs_gear.hpp"
-#include "sdl_module.hpp"
+#pragma once
 
-namespace RAOE::Gears
+#include "core_minimal.hpp"
+
+namespace RAOE
 {
-  
-    struct SDLFLECSGear : public RAOE::Cogs::Gear
-    {
-        SDLFLECSGear(RAOE::Cogs::BaseCog& in_cog)
-            : RAOE::Cogs::Gear(in_cog) 
-        {}
-        virtual void activated()
-        {          
-            FlecsGear* flecs_gear = engine().get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
-
-            if(flecs_gear)
-            {
-                flecs_gear->ecs_world_client->import<RAOE::ECS::SDL::Module>();
-            }
-        }
-    };
+    class Engine;
 }
 
-RAOE_DEFINE_GEAR(SDLGear, RAOE::Gears::SDLFLECSGear)
+namespace RAOE::Service
+{
+    class IService
+    {
+    public:
+        IService() = delete; //only use the engine constructor!
+        IService(const IService&) = delete; //cannot copy a service, only one can exist at a time.
+        IService(IService&&) = delete; //cannot delete a service
+        virtual ~IService() = default;
+
+        RAOE::Engine& engine() const { return m_engine; }
+    protected:
+        IService(Engine& in_engine)
+            : m_engine(in_engine)
+        {
+
+        }
+        
+
+    private:
+        RAOE::Engine& m_engine;
+    };
+}

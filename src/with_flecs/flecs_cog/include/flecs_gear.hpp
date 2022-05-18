@@ -24,7 +24,7 @@ namespace RAOE::Gears
     extern const std::string FlecsGearName;
     struct FlecsGear : public RAOE::Cogs::Gear
     {
-        FlecsGear();
+        FlecsGear(RAOE::Cogs::BaseCog&);
       
         virtual void activated() override;
         virtual void deactivated() override;

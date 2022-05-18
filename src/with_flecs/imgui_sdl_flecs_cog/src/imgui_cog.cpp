@@ -22,9 +22,15 @@ namespace RAOE::Gears
 {
     struct ImguiSdlFlecsGear : public RAOE::Cogs::Gear
     {
+        ImguiSdlFlecsGear(RAOE::Cogs::BaseCog& in_cog)
+            : RAOE::Cogs::Gear(in_cog)
+        {
+
+        }
+
         virtual void activated()
         {
-            FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
+           FlecsGear* flecs_gear = engine().get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
             if(flecs_gear)
             {
                 flecs_gear->ecs_world_client->import<RAOE::ECS::Imgui::Module>();

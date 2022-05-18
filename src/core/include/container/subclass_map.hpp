@@ -61,7 +61,7 @@ namespace raoe::container
             }
 
             auto [itr, success] = storage.emplace(typeid(T), std::make_unique<T>(std::forward<Args>(args)...));
-            return success ? dynamic_cast<T*>((*itr).get()) : nullptr;
+            return success ? dynamic_cast<T*>((*itr).second.get()) : nullptr;
         }
 
         /***
@@ -90,6 +90,12 @@ namespace raoe::container
         {
             auto itr = storage.find(typeid(T));
             return itr != storage.end() ? dynamic_cast<T*>((*itr).second.get()) : nullptr;
+        }
+
+        BaseClass* find(const std::type_info& type_info)
+        {
+            auto itr = storage.find(type_info);
+            return itr != storage.end() ? (*itr).second.get() : nullptr;
         }
 
         template<std::derived_from<BaseClass> T>
@@ -128,5 +134,12 @@ namespace raoe::container
          * 
          */
         std::unordered_map<TypeInfoRef, std::unique_ptr<BaseClass>, Hasher, EqualTo> storage;
+
+    public:
+        auto begin() const { return storage.begin(); }
+        auto end() const { return storage.end(); }
+
+        auto cbegin() const { return storage.cbegin(); }
+        auto cend() const { return storage.cend(); }
     };
 }

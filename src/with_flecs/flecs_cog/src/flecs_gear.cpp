@@ -18,6 +18,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "engine.hpp"
 #include "client_app_module.hpp"
 #include "cogs/cog.hpp"
+#include "services/tick_service.hpp"
 
 namespace RAOE::Gears
 {
@@ -66,22 +67,23 @@ namespace RAOE::Gears
     }
 
 
-    FlecsGear::FlecsGear()   
-        : ecs_world_client(std::make_unique<flecs::world>())
+    FlecsGear::FlecsGear(RAOE::Cogs::BaseCog& in_cog)   
+        : RAOE::Cogs::Gear(in_cog)
+        , ecs_world_client(std::make_unique<flecs::world>())
     {
+        ecs_world_client->set_context(&engine());
         InitFLECSSystem();    
     }
 
     void FlecsGear::activated()    
     {
-        Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
-        engine_gear->register_tickfunc([this, engine_gear]()
+        engine().get_service<RAOE::Service::TickService>()->register_tickfunc([this]()
         {
             if(ecs_world_client)
             {
                 if(!ecs_world_client->progress())
                 {
-                    engine_gear->request_exit();
+                    engine().get_service<RAOE::Service::TickService>()->request_exit();
                 }
             }
         });

@@ -24,12 +24,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "cogs/cog.hpp"
 
+#define DECLARE_COG(CogFuncName) extern "C" void CogFuncName(RAOE::Engine& engine);
+#define CALL_COG(CogFuncName) CogFuncName(engine);
+
 namespace RAOE::_GENERATED
 {
-    ${all_static_cog_function_declarations}
+${all_static_cog_function_declarations}
 
-    extern "C" void LoadStaticCogs()
-    {
-        ${all_static_cog_function_definitions}
+    extern "C" void LoadStaticCogs(RAOE::Engine& engine)
+    {        
+${all_static_cog_function_definitions}
     }
 }

@@ -14,20 +14,22 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#include "console_gear.hpp"
-#include "engine.hpp"
+#pragma once
 
+#include "core_minimal.hpp"
+#include "container/subclass_map.hpp"
+#include "services/iservice.hpp"
 
-namespace RAOE::Gears
+namespace RAOE
 {
-    const std::string ConsoleGearName("Global::Console::ConsoleGear");
-    ConsoleGear::ConsoleGear(RAOE::Cogs::BaseCog& in_cog)    
-        : RAOE::Cogs::Gear(in_cog)
-        , console_ptr(std::make_unique<RAOE::Console::DisplayConsole>())
-    {
-    
-    }
-
+    class Engine;
 }
 
-RAOE_DEFINE_GEAR(ConsoleGear, RAOE::Gears::ConsoleGear)
+namespace RAOE::_
+{
+      
+    class ServiceComponent
+    {
+
+    };
+}

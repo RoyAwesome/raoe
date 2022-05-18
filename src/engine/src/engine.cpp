@@ -21,79 +21,69 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "console/console.hpp"
 #include "console/command.hpp"
 
+#include "services/tick_service.hpp"
+#include "cogs/cog_service.hpp"
+#include "cogs/gear_service.hpp"
+
 namespace RAOE
-{
-    const std::string EngineCogName("Global::Engine");
-    namespace Gears
-    {
-        const std::string EngineGearName("Engine::Gear");
-    }
+{ 
     /*
         Special Engine Cog
         The Engine is not a cog like other parts of the engine.  It manages the cogs, and does not generate one itself
 
         So, we need to manually create a cog for the engine to host the engine's gears.  
     */
-    namespace _
+    struct EngineCog : public RAOE::Cogs::BaseCog
     {
-        struct EngineCog : public RAOE::Cogs::BaseCog
+        EngineCog(RAOE::Engine& in_engine)
+            : RAOE::Cogs::BaseCog(in_engine, "Global::Engine")
+        {    
+
+        }
+
+        virtual void register_gears() override
         {
-            friend class Engine;
-            EngineCog()
-                : RAOE::Cogs::BaseCog(std::string(EngineCogName))
-            {    
+            
+        }
+        virtual bool is_engine_cog() override { return true; }
+    };
 
-            }
-
-            virtual void register_gears() override
-            {
-                register_gear(Gears::EngineGearName, [](){ return new RAOE::Gears::Engine(); });
-            }
-
-            virtual bool is_engine_cog() override { return true; }
-            std::unique_ptr<Engine> engine_ptr;
-        };
-
-    }
 
 
     namespace TransitionFunc
     {
-        static auto NoOp = [](RAOE::Cogs::BaseCog&) { };
-        static auto ConstructGears = [](RAOE::Cogs::BaseCog& cog) { 
+        void no_op(RAOE::Cogs::BaseCog&) { };
+        void register_gears(RAOE::Cogs::BaseCog& cog) 
+        { 
             cog.register_gears();
-            cog.construct_gears();
         };
 
-        static auto ActivateGears = [](RAOE::Cogs::BaseCog& for_cog) { 
-            for(auto& [name, value] : RAOE::Cogs::Registry::Get().gears())
+        void activate_gears(RAOE::Cogs::BaseCog& for_cog) 
+        { 
+            RAOE::Service::GearService* gear_service = for_cog.engine().get_service<RAOE::Service::GearService>();
+            for(const auto& [_, gear_ptr] : gear_service->all_gears())
             {
-                auto& [gear, cog] = value;
-                if(cog == &for_cog)
+                if(gear_ptr && &gear_ptr->cog() == &for_cog)
                 {
-                    gear->activated();
+                    gear_ptr->activated();
                 }
-            }
+            }           
         };
 
-        static auto ShutdownGears = [](RAOE::Cogs::BaseCog& for_cog) { 
-             for(auto& [name, value] : RAOE::Cogs::Registry::Get().gears())
+        void ShutdownGears(RAOE::Cogs::BaseCog& for_cog) 
+        { 
+            RAOE::Service::GearService* gear_service = for_cog.engine().get_service<RAOE::Service::GearService>();
+            for(const auto& [_, gear_ptr] : gear_service->all_gears())
             {
-                auto& [gear, cog] = value;
-                if(cog == &for_cog)
+                if(gear_ptr && &gear_ptr->cog() == &for_cog)
                 {
-                    gear->deactivated();
+                    gear_ptr->deactivated();
                 }
-            }
+            }   
         };
 
-        static auto LockCogForShutdown  = [](RAOE::Cogs::BaseCog&) { 
-
-        };
-
-        static auto ShutdownEngine = [](RAOE::Cogs::BaseCog& cog) { 
-            _::EngineCog& engine_cog = static_cast<_::EngineCog&>(cog);
-            engine_cog.engine_ptr.reset();
+        void LockCogForShutdown(RAOE::Cogs::BaseCog&) 
+        { 
         };
     }
 
@@ -102,11 +92,12 @@ namespace RAOE
         "quit",
         "Exits the game",
         []() {
-            Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
+            /*Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
             if(engine_gear != nullptr)
             {
                 engine_gear->request_exit();
             }
+            */
         }
     );
 
@@ -128,57 +119,81 @@ namespace RAOE
         foo
     );
 
-    Engine& Engine::Init(int32 argc, char* argv[])
+
+
+
+    Engine::Engine(int argv, char** argc)
     {
+        init_service<RAOE::Service::TickService>();
+        init_service<RAOE::Service::GearService>();
+
+
+        RAOE::Service::CogService* cog_service = init_service<RAOE::Service::CogService>();
+        //At this point, there are no cogs in the registry.  We must create the special engine cog here with it's own gears
+        //and activate them. 
+        cog_service->register_static_cog<EngineCog>();
+        cog_service->transition_cog<EngineCog>(RAOE::Cogs::ECogStatus::PreActivate, TransitionFunc::register_gears);
+        cog_service->transition_cog<EngineCog>(RAOE::Cogs::ECogStatus::Activated, TransitionFunc::activate_gears);
+    }
+
+    Engine::~Engine()
+    {      
+        if(RAOE::Service::CogService* cog_service = get_service<RAOE::Service::CogService>())
+        {
+            cog_service->transition_cog<EngineCog>(RAOE::Cogs::ECogStatus::PreShutdown, TransitionFunc::ShutdownGears);
+            cog_service->transition_cog<EngineCog>(RAOE::Cogs::ECogStatus::Shutdown, TransitionFunc::no_op);
+        }
+    }
+
+    void Engine::Startup()    
+    {  
         spdlog::info("Initializing Roy Awesome's Open Engine (RAOE)");
 
-        //At this point, there are no cogs in the registry.  We must create the special engine cog here with it's own gears
-        //and activate them.  
-        _::EngineCog& EngineCog = static_cast<_::EngineCog&>(RAOE::Cogs::Registry::Get().construct_cog<_::EngineCog>(EngineCogName));
-        EngineCog.engine_ptr = std::make_unique<Engine>();
-        RAOE::Cogs::Registry::Get().transition_cog(EngineCogName, RAOE::Cogs::ECogStatus::PreActivate, TransitionFunc::ConstructGears);
-        RAOE::Cogs::Registry::Get().transition_cog(EngineCogName, RAOE::Cogs::ECogStatus::Activated, TransitionFunc::ActivateGears);
+        RAOE::Service::CogService* cog_service = get_service<RAOE::Service::CogService>();
+        if(cog_service == nullptr)
+        {
+            spdlog::error("Unable to start up engine, cog service doesn't exist");
+            return;
+        }
 
-        //Construct the statically linked cogs
-        RAOE::Cogs::Registry::Get().create_statically_linked_cogs();
-        RAOE::Cogs::Registry::Get().transition_cogs(RAOE::Cogs::ECogStatus::PreActivate, TransitionFunc::ConstructGears);
-        RAOE::Cogs::Registry::Get().transition_cogs(RAOE::Cogs::ECogStatus::Activated, TransitionFunc::ActivateGears);
+        cog_service->transition_cogs(RAOE::Cogs::ECogStatus::PreActivate, TransitionFunc::register_gears);
+        cog_service->transition_cogs(RAOE::Cogs::ECogStatus::Activated, TransitionFunc::activate_gears);
 
         spdlog::info("Registered Commands: ");
         for(auto& cmd : Console::CommandRegistry::Get().elements())
         {
             spdlog::info("\t{} - {}", cmd->name(), cmd->description());
         }
-
-        return *EngineCog.engine_ptr.get();
     }
 
     bool Engine::Run()    
     {
-        Gears::Engine* engine_gear = static_cast<Gears::Engine*>(RAOE::Cogs::Registry::Get().get_gear(Gears::EngineGearName));
-        if(engine_gear == nullptr)
+        RAOE::Service::TickService* tick_service = get_service<RAOE::Service::TickService>();
+
+        if(tick_service == nullptr)
         {
-            spdlog::error("Engine::Run() - Unable to tick, cannot find {}}!", Gears::EngineGearName);
+            spdlog::error("Engine::Run() - Unable to tick, cannot find the tick service!");
             return false;
         }
 
-        for(auto& tickfunc : engine_gear->tickfuncs())
-        {
-            tickfunc();
-        }
-        return !engine_gear->should_exit();
+        tick_service->run_frame();
+
+        return tick_service->should_exit();
     }
 
     void Engine::Shutdown()    
     {
         spdlog::info("Shutting down cogs for clean shutdown");
+      
+        RAOE::Service::CogService* cog_service = get_service<RAOE::Service::CogService>();
+        if(cog_service == nullptr)
+        {
+            spdlog::error("Unable to shut down engine cleanly, cog service doesn't exist");
+            return;
+        }
 
-        RAOE::Cogs::Registry::Get().transition_cogs(RAOE::Cogs::ECogStatus::PreShutdown, TransitionFunc::ShutdownGears);
-        
-        RAOE::Cogs::Registry::Get().transition_cogs(RAOE::Cogs::ECogStatus::Shutdown, TransitionFunc::LockCogForShutdown);
-
-        RAOE::Cogs::Registry::Get().transition_cog(EngineCogName, RAOE::Cogs::ECogStatus::PreShutdown, TransitionFunc::ShutdownGears);
-        RAOE::Cogs::Registry::Get().transition_cog(EngineCogName, RAOE::Cogs::ECogStatus::Shutdown, TransitionFunc::ShutdownEngine);
+        cog_service->transition_cogs(RAOE::Cogs::ECogStatus::PreShutdown, TransitionFunc::ShutdownGears);
+        cog_service->transition_cogs(RAOE::Cogs::ECogStatus::Shutdown, TransitionFunc::LockCogForShutdown);
     }
 
 

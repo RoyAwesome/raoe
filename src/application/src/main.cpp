@@ -30,25 +30,28 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 int main(int argc, char* argv[])
 {
+    RAOE::Engine engine(argc, argv);
+
 #if RAOE_STATIC_COGS
-    RAOE::_GENERATED::LoadStaticCogs();
+    RAOE::_GENERATED::LoadStaticCogs(engine);
 #endif
 
-    RAOE::Engine& engine = RAOE::Engine::Init(argc, argv);
+    engine.Startup();
 
+    
     //HACKHACK - Make a window here (TODO: Find a better place to do this)
     using FlecsGear = RAOE::Gears::FlecsGear;
-    FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
+    FlecsGear* flecs_gear = engine.get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
     if(flecs_gear)
     {
-        flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(640, 480), glm::i8vec4(0, 0, 0, 0)});
+        flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(800, 600), glm::i8vec4(0, 0, 0, 0)});
     }
     else
     {
         spdlog::warn("Unable to find flecs cog");
     }
 
-    while(engine.Run()) {}
+    while(!engine.Run()) {}
     engine.Shutdown();
 
     return 0;

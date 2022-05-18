@@ -23,10 +23,12 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "imgui_impl_sdlrenderer.h"
 
 #include "imcmd_command_palette.h"
+#include "cogs/gear.hpp"
+
 
 #include "console/command.hpp"
 #include "flecs_gear.hpp"
-#include "cogs/cog.hpp"
+
 #include "console_gear.hpp"
 
 namespace RAOE::ECS::Imgui
@@ -63,7 +65,7 @@ namespace RAOE::ECS::Imgui
             if(info->should_show_console)
             {
                 using ConsoleGear = RAOE::Gears::ConsoleGear;
-                ConsoleGear* console_gear = static_cast<ConsoleGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::ConsoleGearName));
+                ConsoleGear* console_gear = ((Engine*)e.world().get_context())->get_service<RAOE::Service::GearService>()->get_gear<ConsoleGear>();
                 if(console_gear && console_gear->display_console())
                 {
                     console_gear->display_console()->Draw("Console", &info->should_show_console);
@@ -117,6 +119,7 @@ namespace RAOE::ECS::Imgui
         "ShowDemo",
         "Shows the Demo Window",
         []() {
+            /*
             using FlecsGear = RAOE::Gears::FlecsGear;
             FlecsGear* flecs_gear = static_cast<FlecsGear*>(RAOE::Cogs::Registry::Get().get_gear(RAOE::Gears::FlecsGearName));
             if(flecs_gear)
@@ -124,6 +127,7 @@ namespace RAOE::ECS::Imgui
                 bool& should_show_menu = flecs_gear->ecs_world_client->module<Module>().get_mut<ImCmdInfo>()->should_show_demo_window;
                 should_show_menu = !should_show_menu;
             }
+            */
         }
     );
 

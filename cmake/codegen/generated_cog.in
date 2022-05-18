@@ -36,7 +36,12 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #define QUALIFIED_COG_NAME QUAL_NAME_STR(COG_NAMESPACE) QUAL_NAME_TEXT("::") QUAL_NAME_STR(COG_NAME)
 
 
+#include "engine.hpp"
 #include "cogs/cog.hpp"
+#include "cogs/gear.hpp"
+#include "cogs/cog_service.hpp"
+#include "cogs/gear_service.hpp"
+
 
 ${cog_generated_gear_external_definitions}
 
@@ -45,15 +50,15 @@ namespace RAOE::Cogs::_GENERATED::COG_NAMESPACE
     class COG_NAME : public RAOE::Cogs::BaseCog
     {
     public:
-        COG_NAME()
-            : RAOE::Cogs::BaseCog(std::string(QUALIFIED_COG_NAME))
+        COG_NAME(RAOE::Engine& in_engine)
+            : RAOE::Cogs::BaseCog(in_engine, std::string(QUALIFIED_COG_NAME))
         {
 
         }
         
         virtual void register_gears() override
         {
-            ${cog_generated_gear_external_declarations}
+${cog_generated_gear_external_declarations}
         }
     };    
 }

@@ -77,8 +77,8 @@ function(raoe_add_cog)
         set(cog_generated_gear_external_declarations "")
         #if this has gears, generate them
         foreach(cog_gear_name ${raoe_add_cog_GEARS})
-            string(APPEND cog_generated_gear_external_definitions "extern RAOE::Cogs::Gear* __GENERATED_CONSTRUCT_${cog_gear_name}();")
-            string(APPEND cog_generated_gear_external_declarations "RAOE_REGISTER_GEAR_FACTORY(${cog_gear_name})")
+            string(APPEND cog_generated_gear_external_definitions "RAOE_GEAR_GENERATE_FUNC_DECL(${cog_gear_name});")
+            string(APPEND cog_generated_gear_external_declarations "\t\t\tRAOE_GEAR_GENERATE_FUNC_CALL(${cog_gear_name});")
         endforeach()
         
 
@@ -108,8 +108,8 @@ function(raoe_generate_static_cogs targets_to_set_include)
     get_property(all_static_cog_function_names GLOBAL PROPERTY RAOE_STATIC_COG_FUNCTION_NAMES)
 
     foreach(static_cog_function_name ${all_static_cog_function_names})
-        string(APPEND all_static_cog_function_declarations "extern \"C\" char ${static_cog_function_name}();\n")
-        string(APPEND all_static_cog_function_definitions "${static_cog_function_name}();\n")
+        string(APPEND all_static_cog_function_declarations "\tDECLARE_COG(${static_cog_function_name})\n")
+        string(APPEND all_static_cog_function_definitions "\t\tCALL_COG(${static_cog_function_name})\n")
     endforeach()
 
     configure_file(${CMAKE_CURRENT_FUNCTION_LIST_DIR}/codegen/static_cogs.in

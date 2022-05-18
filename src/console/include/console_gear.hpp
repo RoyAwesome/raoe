@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "cogs/cog.hpp"
+#include "cogs/gear.hpp"
 #include "display_console.hpp"
 
 namespace RAOE::Gears
@@ -24,7 +24,7 @@ namespace RAOE::Gears
     extern const std::string ConsoleGearName;
     struct ConsoleGear : public RAOE::Cogs::Gear
     {      
-        ConsoleGear();
+        ConsoleGear(RAOE::Cogs::BaseCog&);
 
         RAOE::Console::DisplayConsole* display_console() { return console_ptr.get(); }
         

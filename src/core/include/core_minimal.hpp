@@ -13,21 +13,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#pragma once
 
-#include "console_gear.hpp"
-#include "engine.hpp"
+#include "types.hpp"
+#include "debug.hpp"
 
-
-namespace RAOE::Gears
-{
-    const std::string ConsoleGearName("Global::Console::ConsoleGear");
-    ConsoleGear::ConsoleGear(RAOE::Cogs::BaseCog& in_cog)    
-        : RAOE::Cogs::Gear(in_cog)
-        , console_ptr(std::make_unique<RAOE::Console::DisplayConsole>())
-    {
-    
-    }
-
-}
-
-RAOE_DEFINE_GEAR(ConsoleGear, RAOE::Gears::ConsoleGear)
+#include "spdlog/spdlog.h"

@@ -90,3 +90,15 @@ TEST(SubclassMapTest, Contains)
 
     EXPECT_EQ(animal_map.contains<human>(), true);
 }
+
+TEST(SubclassMapTest, Find)
+{
+    raoe::container::subclass_map<animal> animal_map;
+
+    animal_map.insert<cat>();
+    animal_map.insert<dog>();
+    animal_map.insert<cow>();
+    animal_map.insert<human>();
+
+    EXPECT_EQ(animal_map.find(typeid(cat))->speak(), "meow"sv);
+}
