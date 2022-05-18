@@ -88,7 +88,12 @@ namespace RAOE::Console
             {
                 functor(engine, command_line);
                 return EExecuteError::Success;
-            }               
+            }      
+            else if constexpr (requires (std::string_view sv) { functor(sv); })
+            {
+                functor(command_line);
+                return EExecuteError::Success;
+            }          
             else if constexpr (requires(RAOE::Engine& e, Args... args) { functor(e, args...); })
             {
                 static_assert(true, "TODO: This");
