@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME}
     "src/console/console.cpp"
     "src/cogs/cog.cpp"
     "src/cogs/cog_service.cpp"
+    "src/resource/tag.cpp"
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
@@ -26,6 +27,10 @@ target_link_libraries(
     glm
     spdlog
     raoe::core
+    ctre::ctre
 )
 
 add_library(raoe::engine ALIAS ${PROJECT_NAME})
+
+add_subdirectory("test")
+add_subdirectory("third_party")
