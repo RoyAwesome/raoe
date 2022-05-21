@@ -16,20 +16,12 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "core_minimal.hpp"
-#include "container/subclass_map.hpp"
-#include "services/iservice.hpp"
-
-namespace RAOE
+namespace RAOE::Resource
 {
-    class Engine;
-}
+    class Handle;
 
-namespace RAOE::_
-{
-      
-    class ServiceComponent
+    class IResource
     {
-
+        
     };
 }

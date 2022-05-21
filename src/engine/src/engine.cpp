@@ -24,6 +24,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "services/tick_service.hpp"
 #include "cogs/cog_service.hpp"
 #include "cogs/gear_service.hpp"
+#include "resource/resource_service.hpp"
 
 namespace RAOE
 { 
@@ -121,6 +122,7 @@ namespace RAOE
     {
         init_service<RAOE::Service::TickService>();
         init_service<RAOE::Service::GearService>();
+        init_service<RAOE::Resource::Service>();
 
 
         RAOE::Service::CogService* cog_service = init_service<RAOE::Service::CogService>();

@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME}
     "src/cogs/cog.cpp"
     "src/cogs/cog_service.cpp"
     "src/resource/tag.cpp"
+    "src/resource/resource_service.cpp"
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

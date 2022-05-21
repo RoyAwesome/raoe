@@ -46,7 +46,7 @@ namespace std
 {
     template<> struct hash<RAOE::Resource::Tag>
     {
-        std::size_t operator()(RAOE::Resource::Tag const& s)
+        std::size_t operator()(RAOE::Resource::Tag const& s) const
         {
             return std::hash<std::string>{}(s.m_tag);
         }
