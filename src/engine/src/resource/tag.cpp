@@ -15,7 +15,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include "resource/tag.hpp"
+#include "core.hpp"
 #include "ctre.hpp"
+
 
 using namespace std::literals::string_view_literals;
 
@@ -29,7 +31,7 @@ namespace RAOE::Resource
         const bool has_no_colon =  m_tag.find_first_of(":") == std::string::npos;
         if(has_no_colon || has_colon_no_prefix)
         {
-            m_tag = std::string(DefaultPrefix) + ":" + m_tag;
+            m_tag =  fmt::format("{}:{}", DefaultPrefix, m_tag);
         }     
         //Validate the prefix
         {        

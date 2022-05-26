@@ -19,6 +19,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "core.hpp"
 #include "services/iservice.hpp"
 #include "resource/tag.hpp"
+#include "resource/iresource.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -30,18 +31,26 @@ namespace RAOE::Resource
     class Service : public RAOE::Service::IService
     {
     public:
+        friend class Handle;
         Service(RAOE::Engine& in_engine)
             : IService(in_engine)
         {
         }
 
         std::shared_ptr<Handle> get_resource(const Tag& tag);
-
+        std::weak_ptr<Handle> get_resource_weak(const Tag& tag);
+        
         std::shared_ptr<Handle> load_resource(const Tag& tag);
+
+        std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::unique_ptr<IResource>&& resource);
+
+
 
     private:
         std::shared_ptr<Handle> find_or_create_handle(const Tag& tag);
+        void pin_resource(const Tag& tag);
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> handle_map;
+        std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;
     };
 }

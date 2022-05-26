@@ -26,7 +26,6 @@ namespace RAOE
 namespace RAOE::Resource
 {
     class Service;
-    class IResource;
 
     class Handle
     {
@@ -35,7 +34,9 @@ namespace RAOE::Resource
 
         const Tag& tag() const { return m_tag; }
         RAOE::Engine& engine() const { return m_engine; }
-        bool loaded() const { return !!m_resource; }
+        bool loaded() const;
+
+        void pin();
 
         void load_resource_synchronously() {} ;
     private:

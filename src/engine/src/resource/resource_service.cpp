@@ -14,9 +14,10 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-
+#include "core.hpp"
 #include "resource/resource_service.hpp"
 #include "resource/handle.hpp"
+#include "resource/iresource.hpp"
 
 namespace RAOE::Resource
 {
@@ -26,6 +27,12 @@ namespace RAOE::Resource
         return find_or_create_handle(tag);
     }
 
+    std::weak_ptr<Handle> Service::get_resource_weak(const Tag& tag)    
+    {
+        auto found_handle = handle_map.find(tag);
+        return found_handle != handle_map.find(tag) ? found_handle->second : std::weak_ptr<Handle>();
+    }
+
     std::shared_ptr<Handle> Service::load_resource(const Tag& tag)    
     {   
         auto handle = find_or_create_handle(tag);
@@ -33,6 +40,22 @@ namespace RAOE::Resource
         {
             handle->load_resource_synchronously();
         }
+        return handle;
+    }
+
+    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, std::unique_ptr<IResource>&& resource)    
+    {
+        auto handle = find_or_create_handle(tag);
+        //if we have a valid resource at this handle, wipe it out, as we will be emplacing a new resource here.
+        if(handle->m_resource) 
+        {
+            handle->m_resource.reset();
+        }
+        handle->m_resource = std::forward<std::unique_ptr<IResource>>(resource);
+
+        //pin the emplaced resource
+        m_pinned_resources.insert_or_assign(tag, handle);
+
         return handle;
     }
 
@@ -53,5 +76,19 @@ namespace RAOE::Resource
         return handle;
     }
 
+    void Service::pin_resource(const Tag& tag)    
+    {   
+        auto found_handle = handle_map.find(tag);
+        if(found_handle != handle_map.end())
+        {
+            if(auto shared_handle = found_handle->second.lock())
+            {
+                m_pinned_resources.insert_or_assign(tag, found_handle->second.lock());
+                return;
+            }
+           
+        }
+        spdlog::error("Service::pin_resource: unable to pin resource {}, handle not valid.", tag);
+    }
 
 }

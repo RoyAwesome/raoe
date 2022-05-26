@@ -14,29 +14,23 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
 
-#include "core.hpp"
+#include "resource/handle.hpp"
+#include "resource/iresource.hpp"
+#include "resource/resource_service.hpp"
+#include "engine.hpp"
 
 namespace RAOE::Resource
 {
-    class Handle;
-
-    class IResource
+    bool Handle::loaded() const
     {
-    public:
-        enum class ELoadStatus : uint8
-        {
-            Unloaded,
-            Loading,
-            Loaded,
-        };
+        return m_resource && m_resource->loadstatus() == IResource::ELoadStatus::Loaded;
+    }
 
-        ELoadStatus loadstatus() const { return m_loadstatus; }
-    private:
-        ELoadStatus m_loadstatus;
-    };
-
-    //template t resource loader
-    //
+    void Handle::pin()    
+    {
+        engine().get_service<RAOE::Resource::Service>()->pin_resource(tag());
+    }
 }
+
+
