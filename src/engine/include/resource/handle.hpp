@@ -17,6 +17,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #pragma once
 #include "resource/tag.hpp"
 #include "resource/iresource.hpp"
+#include <optional>
+#include <memory>
 
 namespace RAOE
 {
@@ -30,25 +32,44 @@ namespace RAOE::Resource
     class Handle
     {
     public:
+        using ResourcePointerRef = std::optional<std::reference_wrapper<std::unique_ptr<IResource>>>;
         friend class Service;
 
+        ~Handle();
+
         const Tag& tag() const { return m_tag; }
-        RAOE::Engine& engine() const { return m_engine; }
+        RAOE::Engine& engine() const;
+        Service* service() const { return &m_service; }
         bool loaded() const;
+
+        IResource* get() const;
+
+        template<typename T>
+        T* get() const
+        {
+            return dynamic_cast<T*>(get());
+        }
 
         void pin();
 
         void load_resource_synchronously() {} ;
     private:
-        Handle(RAOE::Engine& in_engine, const Tag& in_tag)
-            : m_engine(in_engine)
+        Handle(Service& in_service, const Tag& in_tag)
+            : m_service(in_service)
             , m_tag(in_tag)
-        {
-
+            , m_resource()
+        {            
         }
         
-        RAOE::Engine& m_engine;
+        Handle(Service& in_service, const Tag& in_tag, std::unique_ptr<IResource>& in_resource)
+            : m_service(in_service)
+            , m_tag(in_tag)
+            , m_resource(in_resource)
+        {
+        }
+        
+        Service& m_service;
         Tag m_tag;
-        std::unique_ptr<IResource> m_resource;
+        ResourcePointerRef m_resource;
     };
 }

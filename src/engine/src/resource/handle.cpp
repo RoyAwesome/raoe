@@ -24,13 +24,31 @@ namespace RAOE::Resource
 {
     bool Handle::loaded() const
     {
-        return m_resource && m_resource->loadstatus() == IResource::ELoadStatus::Loaded;
+        return m_resource && m_resource->get()->loadstatus() == IResource::ELoadStatus::Loaded;
+    }
+
+    IResource* Handle::get() const    
+    {
+        if(m_resource)
+        {
+            return m_resource->get().get();
+        }    
+        return nullptr;
     }
 
     void Handle::pin()    
     {
-        engine().get_service<RAOE::Resource::Service>()->pin_resource(tag());
+        service()->pin_resource(this);
     }
+
+    Handle::~Handle()    
+    {   
+        service()->on_handle_destroyed(this);
+    
+    }
+
+    RAOE::Engine& Handle::engine() const { return m_service.engine(); } 
+   
 }
 
 
