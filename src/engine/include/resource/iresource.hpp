@@ -32,9 +32,8 @@ namespace RAOE::Resource
             Loaded,
         };
 
-        ELoadStatus loadstatus() const { return m_loadstatus; }
+        virtual ELoadStatus loadstatus() const = 0;
     private:
-        ELoadStatus m_loadstatus;
     };
 
     //template t resource loader

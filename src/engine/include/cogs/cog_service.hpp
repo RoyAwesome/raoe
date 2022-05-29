@@ -25,6 +25,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <concepts>
 #include "container/subclass_map.hpp"
 
+namespace RAOE
+{
+    class Engine;
+}
+
 namespace RAOE::Service
 {
     class CogService : public IService
@@ -32,6 +37,8 @@ namespace RAOE::Service
         using ECogStatus = RAOE::Cogs::ECogStatus;
         using BaseCog = RAOE::Cogs::BaseCog;
     public:
+        friend class RAOE::Engine;
+
         CogService(Engine& in_engine)
             : IService(in_engine)
         {
@@ -40,7 +47,7 @@ namespace RAOE::Service
         template<RAOE::Cogs::is_cog T>
         T* register_static_cog()
         {
-            return m_cogs.insert<T>(engine());
+           return dynamic_cast<T*>(find_or_create_cog<T>().get());
         }
 
         template<RAOE::Cogs::is_cog T>
@@ -58,6 +65,21 @@ namespace RAOE::Service
 
         void transition_cogs(ECogStatus transition_to, std::function<void(BaseCog&)> transition_func);
     private:
+        template<RAOE::Cogs::is_cog T>
+        std::unique_ptr<RAOE::Cogs::BaseCog>& get_cog_uniqueptr()
+        {
+            return m_cogs.find_ptr<T>();
+        }
+
+        template<RAOE::Cogs::is_cog T>
+        std::unique_ptr<RAOE::Cogs::BaseCog>& find_or_create_cog()
+        {
+            m_cogs.insert<T>(engine());
+            return get_cog_uniqueptr<T>();
+        }
+
+        void register_cog_resource(std::unique_ptr<BaseCog>& cog_ptr);
+
         raoe::container::subclass_map<RAOE::Cogs::BaseCog> m_cogs;
     };
 }

@@ -53,5 +53,6 @@ namespace RAOE::Resource
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> m_handle_map;
         std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;
+        std::unordered_map<Tag, std::unique_ptr<IResource>> m_owned_resources;
     };
 }

@@ -99,6 +99,22 @@ namespace raoe::container
         }
 
         template<std::derived_from<BaseClass> T>
+        std::unique_ptr<BaseClass>& find_ptr()
+        {
+            auto itr = storage.find(typeid(T));
+            if(itr == storage.end())
+            {
+                raoe::debug::debug_break();
+                assert(true);
+                std::abort();
+                //panic
+                
+                return (*storage.begin()).second;
+            }
+            return (*itr).second;
+        }
+
+        template<std::derived_from<BaseClass> T>
         bool contains() const
         {
             return storage.contains(typeid(T));

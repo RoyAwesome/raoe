@@ -15,6 +15,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include "cogs/cog_service.hpp"
+#include "engine.hpp"
+#include "resource/resource_service.hpp"
 
 namespace RAOE::Service
 {
@@ -38,6 +40,15 @@ namespace RAOE::Service
                 base_cog->m_status = transition_to;                
             }            
         }
+    }
+
+    void CogService::register_cog_resource(std::unique_ptr<BaseCog>& cog_ptr)    
+    {
+        if(RAOE::Resource::Service* resource_service = engine().get_service<RAOE::Resource::Service>())
+        {
+            //resource_service->emplace_resource(cog_ptr->tag(), cog_ptr);
+        }
+    
     }
 
 }

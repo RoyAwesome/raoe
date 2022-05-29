@@ -21,6 +21,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <string>
 #include <memory>
 #include <concepts>
+#include "resource/iresource.hpp"
+#include "resource/tag.hpp"
 
 namespace RAOE
 {
@@ -44,7 +46,7 @@ namespace RAOE::Cogs
         Shutdown,
     };
 
-    class BaseCog
+    class BaseCog : public RAOE::Resource::IResource
     {
         friend class RAOE::Service::CogService;
     public:
@@ -67,6 +69,11 @@ namespace RAOE::Cogs
         virtual void register_gears() = 0;   
 
         virtual bool is_engine_cog() { return false; }
+
+        //BEGIN: IResource Interface
+        virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
+        //END: IResource Interface
+        const RAOE::Resource::Tag& tag() const;
     protected:
 
 
