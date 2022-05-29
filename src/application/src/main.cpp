@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
             using FlecsGear = RAOE::Gears::FlecsGear;            
             if(std::shared_ptr<FlecsGear> flecs_gear = gear_service->get_gear<FlecsGear>().lock())
             {
-                flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(800, 600), glm::i8vec4(0, 0, 0, 0)});
+                flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(1600, 900), glm::i8vec4(0, 0, 0, 0)});
             }
             else
             {
