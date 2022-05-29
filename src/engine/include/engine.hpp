@@ -57,13 +57,13 @@ namespace RAOE
     public:
 
         template<is_service T>
-        T* get_service()
+        std::weak_ptr<T> get_service()
         {
             return services.find<T>();
         }
 
         template<is_service T>
-        T* init_service()
+        std::weak_ptr<T> init_service()
         {
             return services.insert<T>(*this);
         }

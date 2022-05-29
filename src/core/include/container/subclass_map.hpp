@@ -53,15 +53,15 @@ namespace raoe::container
          * Returns nullptr if T is already in this map, or a non-owning pointer if the object was created
         */
         template<std::derived_from<BaseClass> T, typename... Args>
-        T* insert(Args&&... args)
+        std::weak_ptr<T> insert(Args&&... args)
         {
             if(contains<T>()) 
             {
-                return nullptr;
+                return std::weak_ptr<T>();
             }
 
-            auto [itr, success] = storage.emplace(typeid(T), std::make_unique<T>(std::forward<Args>(args)...));
-            return success ? dynamic_cast<T*>((*itr).second.get()) : nullptr;
+            auto [itr, success] = storage.emplace(typeid(T), std::make_shared<T>(std::forward<Args>(args)...));
+            return success ? std::dynamic_pointer_cast<T>((*itr).second) : std::weak_ptr<T>();
         }
 
         /***
@@ -70,14 +70,14 @@ namespace raoe::container
          * Returns nullptr if T is already in this map, or a non-owning pointer if the object was created
         */
         template<std::derived_from<BaseClass> T>
-        T* insert()
+        std::weak_ptr<T> insert()
         {
             if(contains<T>())
             {
                 return nullptr;
             }
-            auto [itr, success] = storage.emplace(typeid(T), std::make_unique<T>());
-            return success ? dynamic_cast<T*>((*itr).second.get()) : nullptr;
+            auto [itr, success] = storage.emplace(typeid(T), std::make_shared<T>());
+            return success ? std::dynamic_pointer_cast<T>((*itr).second) : nullptr;
         }
 
         /***
@@ -86,32 +86,16 @@ namespace raoe::container
          * 
          */
         template<std::derived_from<BaseClass> T>
-        T* find() const
+        std::weak_ptr<T> find() const
         {
             auto itr = storage.find(typeid(T));
-            return itr != storage.end() ? dynamic_cast<T*>((*itr).second.get()) : nullptr;
+            return itr != storage.end() ? std::dynamic_pointer_cast<T>((*itr).second) : nullptr;
         }
 
-        BaseClass* find(const std::type_info& type_info)
+        std::weak_ptr<BaseClass> find(const std::type_info& type_info)
         {
             auto itr = storage.find(type_info);
             return itr != storage.end() ? (*itr).second.get() : nullptr;
-        }
-
-        template<std::derived_from<BaseClass> T>
-        std::unique_ptr<BaseClass>& find_ptr()
-        {
-            auto itr = storage.find(typeid(T));
-            if(itr == storage.end())
-            {
-                raoe::debug::debug_break();
-                assert(true);
-                std::abort();
-                //panic
-                
-                return (*storage.begin()).second;
-            }
-            return (*itr).second;
         }
 
         template<std::derived_from<BaseClass> T>
@@ -149,7 +133,7 @@ namespace raoe::container
          * All the other behavior is useless to me, and replacement should be trivial
          * 
          */
-        std::unordered_map<TypeInfoRef, std::unique_ptr<BaseClass>, Hasher, EqualTo> storage;
+        std::unordered_map<TypeInfoRef, std::shared_ptr<BaseClass>, Hasher, EqualTo> storage;
 
     public:
         auto begin() const { return storage.begin(); }

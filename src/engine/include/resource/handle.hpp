@@ -32,7 +32,6 @@ namespace RAOE::Resource
     class Handle
     {
     public:
-        using ResourcePointerRef = std::optional<std::reference_wrapper<std::unique_ptr<IResource>>>;
         friend class Service;
 
         ~Handle();
@@ -42,13 +41,10 @@ namespace RAOE::Resource
         Service* service() const { return &m_service; }
         bool loaded() const;
 
-        IResource* get() const;
+         std::weak_ptr<IResource> get() const { return m_resource; }
 
-        template<typename T>
-        T* get() const
-        {
-            return dynamic_cast<T*>(get());
-        }
+        template<std::derived_from<IResource> T>
+        std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get()); }
 
         void pin();
 
@@ -61,7 +57,7 @@ namespace RAOE::Resource
         {            
         }
         
-        Handle(Service& in_service, const Tag& in_tag, std::unique_ptr<IResource>& in_resource)
+        Handle(Service& in_service, const Tag& in_tag, std::weak_ptr<IResource> in_resource)
             : m_service(in_service)
             , m_tag(in_tag)
             , m_resource(in_resource)
@@ -70,6 +66,6 @@ namespace RAOE::Resource
         
         Service& m_service;
         Tag m_tag;
-        ResourcePointerRef m_resource;
+        std::weak_ptr<IResource> m_resource;
     };
 }

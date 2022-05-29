@@ -42,7 +42,7 @@ namespace RAOE::Resource
         std::weak_ptr<Handle> get_resource_weak(const Tag& tag);
 
         std::shared_ptr<Handle> load_resource(const Tag& tag);
-        std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::unique_ptr<IResource>& resource);
+        std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource);
 
 
 
@@ -53,6 +53,6 @@ namespace RAOE::Resource
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> m_handle_map;
         std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;
-        std::unordered_map<Tag, std::unique_ptr<IResource>> m_owned_resources;
+        std::unordered_map<Tag, std::shared_ptr<IResource>> m_owned_resources;
     };
 }

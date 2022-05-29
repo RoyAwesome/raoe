@@ -45,44 +45,35 @@ namespace RAOE::Service
         }
         
         template<RAOE::Cogs::is_cog T>
-        T* register_static_cog()
+        std::weak_ptr<T> register_static_cog()
         {
-           return dynamic_cast<T*>(find_or_create_cog<T>().get());
+           return std::dynamic_pointer_cast<T>(find_or_create_cog<T>().lock());
         }
 
         template<RAOE::Cogs::is_cog T>
         void transition_cog(ECogStatus transition_to, std::function<void(BaseCog&)> transition_func)
         {
-            T* cog = m_cogs.find<T>();
-            if(!cog)
+            if(auto cog = m_cogs.find<T>().lock())
             {
-                return;
-            }
-            transition_func(*cog);
-            spdlog::info("Transitioning Cog {} from {} to {}", cog->name(), cog->status(), transition_to);
-            cog->m_status = transition_to;
+                transition_func(*(cog.get()));
+                spdlog::info("Transitioning Cog {} from {} to {}", cog->name(), cog->status(), transition_to);
+                cog->m_status = transition_to;
+            }    
         }
 
         void transition_cogs(ECogStatus transition_to, std::function<void(BaseCog&)> transition_func);
     private:
         template<RAOE::Cogs::is_cog T>
-        std::unique_ptr<RAOE::Cogs::BaseCog>& get_cog_uniqueptr()
-        {
-            return m_cogs.find_ptr<T>();
+        std::weak_ptr<RAOE::Cogs::BaseCog> find_or_create_cog()
+        {           
+            return m_cogs.insert<T>(engine());
         }
 
-        template<RAOE::Cogs::is_cog T>
-        std::unique_ptr<RAOE::Cogs::BaseCog>& find_or_create_cog()
-        {
-            m_cogs.insert<T>(engine());
-            return get_cog_uniqueptr<T>();
-        }
-
-        void register_cog_resource(std::unique_ptr<BaseCog>& cog_ptr);
+        void register_cog_resource(std::weak_ptr<BaseCog> cog_ptr);
 
         raoe::container::subclass_map<RAOE::Cogs::BaseCog> m_cogs;
     };
 }
 
 #define __GENERATED_REGISTER_COG(CogName, CogTypename, CogQualifiedName, CogFunctionName) \
-    extern "C" void CogFunctionName(RAOE::Engine& engine) { engine.get_service<RAOE::Service::CogService>()->register_static_cog<CogTypename>(); }
+    extern "C" void CogFunctionName(RAOE::Engine& engine) { if(auto service = engine.get_service<RAOE::Service::CogService>().lock()) service->register_static_cog<CogTypename>(); }

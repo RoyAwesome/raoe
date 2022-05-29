@@ -77,16 +77,20 @@ namespace RAOE::Gears
 
     void FlecsGear::activated()    
     {
-        engine().get_service<RAOE::Service::TickService>()->register_tickfunc([this]()
+        if(auto tick_service = engine().get_service<RAOE::Service::TickService>().lock())
         {
-            if(ecs_world_client)
+            tick_service->register_tickfunc([this]()
             {
-                if(!ecs_world_client->progress())
+                if(ecs_world_client)
                 {
-                    engine().get_service<RAOE::Service::TickService>()->request_exit();
+                    if(!ecs_world_client->progress())
+                    {
+                        engine().get_service<RAOE::Service::TickService>().lock()->request_exit();
+                    }
                 }
-            }
-        });
+            });
+        }
+       
       
 
         if(ecs_world_client)

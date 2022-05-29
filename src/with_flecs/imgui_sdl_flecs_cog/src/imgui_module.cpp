@@ -49,6 +49,8 @@ namespace RAOE::ECS::Imgui
         ImGui_ImplSDL2_NewFrame(sdl_system.window_handle.get());
         ImGui::NewFrame();   
 
+        Engine& engine = *((Engine*)e.world().get_context());
+
         ImCmdInfo* info = e.world().module<Module>().get_mut<ImCmdInfo>();
         if(info)
         {
@@ -62,15 +64,18 @@ namespace RAOE::ECS::Imgui
                 ImGui::ShowDemoWindow();
             }
 
-            if(info->should_show_console)
+            if(auto gear_service = engine.get_service<RAOE::Service::GearService>().lock())
             {
-                using ConsoleGear = RAOE::Gears::ConsoleGear;
-                ConsoleGear* console_gear = ((Engine*)e.world().get_context())->get_service<RAOE::Service::GearService>()->get_gear<ConsoleGear>();
-                if(console_gear && console_gear->display_console())
-                {
-                    console_gear->display_console()->Draw("Console", &info->should_show_console);
+                if(info->should_show_console)
+                {      
+                    using ConsoleGear = RAOE::Gears::ConsoleGear;
+                    auto console_gear = gear_service->get_gear<ConsoleGear>().lock();
+                    if(console_gear && console_gear->display_console())
+                    {
+                        console_gear->display_console()->Draw("Console", &info->should_show_console);
+                    }
                 }
-            }
+            }           
         }
     }
 
@@ -120,12 +125,15 @@ namespace RAOE::ECS::Imgui
         "Shows the Demo Window",
         +[](RAOE::Engine& e) {            
             using FlecsGear = RAOE::Gears::FlecsGear;
-            FlecsGear* flecs_gear = e.get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
-            if(flecs_gear)
-            {
-                bool& should_show_menu = flecs_gear->ecs_world_client->module<Module>().get_mut<ImCmdInfo>()->should_show_demo_window;
-                should_show_menu = !should_show_menu;
-            }            
+            if(auto gear_service = e.get_service<RAOE::Service::GearService>().lock())
+            {                
+                if(auto flecs_gear = gear_service->get_gear<FlecsGear>().lock())
+                {
+                    bool& should_show_menu = flecs_gear->ecs_world_client->module<Module>().get_mut<ImCmdInfo>()->should_show_demo_window;
+                    should_show_menu = !should_show_menu;
+                }        
+            }
+               
         }
     );
 

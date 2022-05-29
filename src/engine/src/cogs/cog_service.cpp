@@ -42,12 +42,8 @@ namespace RAOE::Service
         }
     }
 
-    void CogService::register_cog_resource(std::unique_ptr<BaseCog>& cog_ptr)    
+    void CogService::register_cog_resource(std::weak_ptr<BaseCog> cog_ptr)    
     {
-        if(RAOE::Resource::Service* resource_service = engine().get_service<RAOE::Resource::Service>())
-        {
-            //resource_service->emplace_resource(cog_ptr->tag(), cog_ptr);
-        }
     
     }
 

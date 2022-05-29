@@ -46,14 +46,9 @@ namespace RAOE::Resource
         return handle;
     }
 
-    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, std::unique_ptr<IResource>& resource)    
+    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource)    
     {
-        auto handle = find_or_create_handle(tag);
-        //if we have a valid resource at this handle, wipe it out, as we will be emplacing a new resource here.
-        if(handle->m_resource) 
-        {
-            handle->m_resource.reset();
-        }
+        auto handle = find_or_create_handle(tag);       
         handle->m_resource = resource;
         //Pin the resource
         pin_resource(handle.get());
@@ -103,16 +98,19 @@ namespace RAOE::Resource
 
     void print_handle_information(Engine& engine)
     {
-        Service* resource_service = engine.get_service<Service>();
-        spdlog::info("Resource Service Info");
-        for(const auto& [tag, handle] : resource_service->m_handle_map)
+        if(std::shared_ptr<Service> resource_service = engine.get_service<Service>().lock())
         {
-            if(auto strong_handle = handle.lock())
+            spdlog::info("Resource Service Info");
+            for(const auto& [tag, handle] : resource_service->m_handle_map)
             {
-                spdlog::info("\t{} - (loaded? {} pinned? {})", tag, strong_handle->loaded(), resource_service->m_pinned_resources.contains(tag));
-            }            
-        }
-        spdlog::info("End Resource Service Info");
+                if(auto strong_handle = handle.lock())
+                {
+                    spdlog::info("\t{} - (loaded? {} pinned? {})", tag, strong_handle->loaded(), resource_service->m_pinned_resources.contains(tag));
+                }            
+            }
+            spdlog::info("End Resource Service Info");
+        }        
+        spdlog::error("print_handle_information: Unable to find resource service");
     }
     using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
     static AutoRegisterConsoleCommand print_handle_info_command = RAOE::Console::CreateConsoleCommand(

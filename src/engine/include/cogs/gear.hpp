@@ -63,6 +63,6 @@ namespace RAOE::Cogs
 #define RAOE_DEFINE_GEAR(GearName, GearClass) \
     RAOE_GEAR_GENERATE_FUNC_DECL(GearName) \
     { \
-        owning_cog.engine().get_service<RAOE::Service::GearService>()->register_gear<GearClass>(owning_cog); \
+        owning_cog.engine().get_service<RAOE::Service::GearService>().lock()->register_gear<GearClass>(owning_cog); \
     }
 

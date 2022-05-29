@@ -30,7 +30,7 @@ namespace RAOE::Gears
 
         virtual void activated()
         {
-           FlecsGear* flecs_gear = engine().get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
+            auto flecs_gear = engine().get_service<RAOE::Service::GearService>().lock()->get_gear<FlecsGear>().lock();
             if(flecs_gear)
             {
                 flecs_gear->ecs_world_client->import<RAOE::ECS::Imgui::Module>();

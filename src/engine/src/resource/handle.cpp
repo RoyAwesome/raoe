@@ -24,16 +24,11 @@ namespace RAOE::Resource
 {
     bool Handle::loaded() const
     {
-        return m_resource && m_resource->get()->loadstatus() == IResource::ELoadStatus::Loaded;
-    }
-
-    IResource* Handle::get() const    
-    {
-        if(m_resource)
+        if(auto hard_resource = m_resource.lock())
         {
-            return m_resource->get().get();
-        }    
-        return nullptr;
+            return hard_resource->loadstatus() == IResource::ELoadStatus::Loaded;
+        }
+        return false;
     }
 
     void Handle::pin()    

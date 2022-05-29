@@ -43,13 +43,13 @@ namespace RAOE::Service
         }
 
         template<RAOE::Cogs::is_gear T>
-        T* get_gear()
+        std::weak_ptr<T> get_gear()
         {
             return m_gears.find<T>();
         }
 
         template<RAOE::Cogs::is_gear T>
-        T* register_gear(RAOE::Cogs::BaseCog& owning_cog)
+        std::weak_ptr<T> register_gear(RAOE::Cogs::BaseCog& owning_cog)
         {
             return m_gears.insert<T>(owning_cog);
         }

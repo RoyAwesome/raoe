@@ -38,18 +38,24 @@ int main(int argc, char* argv[])
 
     engine.Startup();
 
-    
-    //HACKHACK - Make a window here (TODO: Find a better place to do this)
-    using FlecsGear = RAOE::Gears::FlecsGear;
-    FlecsGear* flecs_gear = engine.get_service<RAOE::Service::GearService>()->get_gear<FlecsGear>();
-    if(flecs_gear)
     {
-        flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(800, 600), glm::i8vec4(0, 0, 0, 0)});
+        //HACKHACK - Make a window here (TODO: Find a better place to do this)      
+        using GearService = RAOE::Service::GearService; 
+        if(std::shared_ptr<GearService> gear_service = engine.get_service<GearService>().lock())
+        {
+            using FlecsGear = RAOE::Gears::FlecsGear;            
+            if(std::shared_ptr<FlecsGear> flecs_gear = gear_service->get_gear<FlecsGear>().lock())
+            {
+                flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(800, 600), glm::i8vec4(0, 0, 0, 0)});
+            }
+            else
+            {
+                spdlog::warn("Unable to find flecs cog");
+            }
+        }
+      
     }
-    else
-    {
-        spdlog::warn("Unable to find flecs cog");
-    }
+  
 
     while(!engine.Run()) {}
     engine.Shutdown();
