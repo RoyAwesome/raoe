@@ -19,5 +19,4 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Cogs
 {
-
 }

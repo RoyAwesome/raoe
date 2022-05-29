@@ -66,7 +66,14 @@ namespace RAOE::Service
         template<RAOE::Cogs::is_cog T>
         std::weak_ptr<RAOE::Cogs::BaseCog> find_or_create_cog()
         {           
-            return m_cogs.insert<T>(engine());
+            if(m_cogs.contains<T>())
+            {
+                return m_cogs.find<T>();
+            }
+
+            auto ptr = m_cogs.insert<T>(engine());
+            register_cog_resource(ptr);
+            return ptr;
         }
 
         void register_cog_resource(std::weak_ptr<BaseCog> cog_ptr);

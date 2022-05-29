@@ -44,7 +44,14 @@ namespace RAOE::Service
 
     void CogService::register_cog_resource(std::weak_ptr<BaseCog> cog_ptr)    
     {
-    
+        using ResourceService = RAOE::Resource::Service;
+        if(std::shared_ptr<ResourceService> resource_service = engine().get_service<ResourceService>().lock())
+        {
+            if(std::shared_ptr<BaseCog> cog = cog_ptr.lock())
+            {                
+                resource_service->emplace_resource(cog->tag(), cog);
+            }
+        }
     }
 
 }

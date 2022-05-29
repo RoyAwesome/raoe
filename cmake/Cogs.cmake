@@ -12,12 +12,8 @@ function(raoe_add_cog)
         message(FATAL_ERROR "This cog must have a name")
     endif()
 
-    if(NOT raoe_add_cog_NAMESPACE)
-        set(raoe_add_cog_NAMESPACE "Global")
-    endif()
-
     #create the target
-    string(REPLACE "::" "-" COG_LIBRARY_NAME "raoe-cog-${raoe_add_cog_NAMESPACE}::${raoe_add_cog_NAME}")
+    string(REPLACE "::" "-" COG_LIBRARY_NAME "raoe-cog-${raoe_add_cog_NAME}")
     if(raoe_add_cog_STATIC)        
         add_library("${COG_LIBRARY_NAME}"
             STATIC
@@ -33,7 +29,7 @@ function(raoe_add_cog)
         set_property(TARGET ${COG_LIBRARY_NAME} PROPERTY CXX_STANDARD 20)
     endif()
 
-    set(raoe_cog_library_alias "${raoe_add_cog_NAMESPACE}::${raoe_add_cog_NAME}")
+    set(raoe_cog_library_alias "Cog::${raoe_add_cog_NAME}")
     add_library("${raoe_cog_library_alias}" ALIAS ${COG_LIBRARY_NAME})
 
     if(raoe_add_cog_STATIC)     
@@ -65,13 +61,11 @@ function(raoe_add_cog)
     PRIVATE
     "${cog_api}=1"
     "COG_NAME=${raoe_add_cog_NAME}"
-    "COG_NAMESPACE=${raoe_add_cog_NAMESPACE}"
     ${raoe_add_cog_COMPILE_DEFINITIONS}
     )
 
     #generate the cog file, unless the target says no
     if(NOT raoe_add_cog_NO_GENERATED_COG)
-        set(cog_generated_namespace ${raoe_add_cog_NAMESPACE})
         set(cog_generated_name ${raoe_add_cog_NAME})
         set(cog_generated_gear_external_definitions "")
         set(cog_generated_gear_external_declarations "")

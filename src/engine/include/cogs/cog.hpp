@@ -55,17 +55,17 @@ namespace RAOE::Cogs
         BaseCog(BaseCog&&) = delete; //Cogs cannot be moved
         virtual ~BaseCog() = default;
     protected:
-        explicit BaseCog(RAOE::Engine& in_engine, std::string&& in_name)
+        explicit BaseCog(RAOE::Engine& in_engine, std::string_view in_name)
             : m_engine(in_engine)
             , m_status(ECogStatus::Created)
-            , m_name(in_name)
+            , m_tag(in_name)
         {
         }     
        
     public:
         RAOE::Engine& engine() { return m_engine; }
         ECogStatus status() { return m_status; }
-        std::string_view name() { return m_name; }
+        std::string_view name() { return m_tag.prefix(); }
         virtual void register_gears() = 0;   
 
         virtual bool is_engine_cog() { return false; }
@@ -73,14 +73,15 @@ namespace RAOE::Cogs
         //BEGIN: IResource Interface
         virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
         //END: IResource Interface
-        const RAOE::Resource::Tag& tag() const;
+        
+        const RAOE::Resource::Tag& tag() const { return m_tag; }
     protected:
 
 
     private:
         RAOE::Engine& m_engine;
         ECogStatus m_status;
-        std::string m_name;           
+        RAOE::Resource::Tag m_tag;      
     };
 
     template<typename T> 

@@ -3,7 +3,6 @@ cmake_minimum_required (VERSION 3.22)
 
 raoe_add_cog(
     NAME "Imgui_SDL" STATIC
-    NAMESPACE "Flecs"
     CPP_SOURCE_FILES
         "src/imgui_module.cpp"
         "src/imgui_cog.cpp"
@@ -15,9 +14,9 @@ raoe_add_cog(
             glm
             imgui-sdl  
             imgui_command_palette 
-            Flecs::ECS
-            Flecs::SDL
-            Global::Console
+            Cog::ECS
+            Cog::SDL
+            Cog::Console
     GEARS
         "ImguiGear"
 )

@@ -19,10 +19,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
     DO NOT EDIT
 */
 
-#ifndef COG_NAMESPACE
-#error "Unable to compile cog, no namespace
-#define COG_NAMESPACE ${cog_generated_namespace}
-#endif
+
 
 #ifndef COG_NAME
 #error "Unable to compile cog, no name for the cog
@@ -33,7 +30,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #define QUAL_NAME_STR_2(T) QUAL_NAME_TEXT(#T)
 #define QUAL_NAME_STR(T) QUAL_NAME_STR_2(T)
 
-#define QUALIFIED_COG_NAME QUAL_NAME_STR(COG_NAMESPACE) QUAL_NAME_TEXT("::") QUAL_NAME_STR(COG_NAME)
+#define QUALIFIED_COG_NAME QUAL_NAME_STR(COG_NAME) QUAL_NAME_TEXT(":cog") 
 
 
 #include "engine.hpp"
@@ -45,13 +42,13 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 ${cog_generated_gear_external_definitions}
 
-namespace RAOE::Cogs::_GENERATED::COG_NAMESPACE
+namespace RAOE::Cogs::_GENERATED
 {
     class COG_NAME : public RAOE::Cogs::BaseCog
     {
     public:
         COG_NAME(RAOE::Engine& in_engine)
-            : RAOE::Cogs::BaseCog(in_engine, std::string(QUALIFIED_COG_NAME))
+            : RAOE::Cogs::BaseCog(in_engine, QUALIFIED_COG_NAME)
         {
 
         }
@@ -63,4 +60,4 @@ ${cog_generated_gear_external_declarations}
     };    
 }
 
-__GENERATED_REGISTER_COG(COG_NAME, RAOE::Cogs::_GENERATED::COG_NAMESPACE::COG_NAME, QUALIFIED_COG_NAME, ${cog_generated_external_function_name})
+__GENERATED_REGISTER_COG(COG_NAME, RAOE::Cogs::_GENERATED::COG_NAME, QUALIFIED_COG_NAME, ${cog_generated_external_function_name})

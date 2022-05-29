@@ -37,7 +37,7 @@ namespace RAOE
     struct EngineCog : public RAOE::Cogs::BaseCog
     {
         EngineCog(RAOE::Engine& in_engine)
-            : RAOE::Cogs::BaseCog(in_engine, "Global::Engine")
+            : RAOE::Cogs::BaseCog(in_engine, "raoe:cog")
         {    
 
         }
