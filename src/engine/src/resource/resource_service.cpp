@@ -109,8 +109,11 @@ namespace RAOE::Resource
                 }            
             }
             spdlog::info("End Resource Service Info");
-        }        
-        spdlog::error("print_handle_information: Unable to find resource service");
+        }      
+        else
+        {            
+            spdlog::error("print_handle_information: Unable to find resource service");
+        }  
     }
     using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
     static AutoRegisterConsoleCommand print_handle_info_command = RAOE::Console::CreateConsoleCommand(
