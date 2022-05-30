@@ -49,13 +49,16 @@ namespace RAOE::Service
         }
 
         template<RAOE::Cogs::is_gear T>
-        std::weak_ptr<T> register_gear(RAOE::Cogs::BaseCog& owning_cog)
+        std::weak_ptr<T> register_gear(RAOE::Cogs::BaseCog& owning_cog, std::string_view name)
         {
-            return m_gears.insert<T>(owning_cog);
+            auto gear = m_gears.insert<T>(owning_cog, name);
+            internal_register_gear(std::static_pointer_cast<RAOE::Cogs::Gear>(gear.lock()));
+            return gear;
         }
 
         const raoe::container::subclass_map<RAOE::Cogs::Gear>& all_gears() const { return m_gears; }
     private:
+        void internal_register_gear(const std::shared_ptr<RAOE::Cogs::Gear>& in_gear);
 
         raoe::container::subclass_map<RAOE::Cogs::Gear> m_gears;
     };

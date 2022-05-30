@@ -67,8 +67,8 @@ namespace RAOE::Gears
     }
 
 
-    FlecsGear::FlecsGear(RAOE::Cogs::BaseCog& in_cog)   
-        : RAOE::Cogs::Gear(in_cog)
+    FlecsGear::FlecsGear(RAOE::Cogs::BaseCog& in_cog, std::string_view name)   
+        : RAOE::Cogs::Gear(in_cog, name)
         , ecs_world_client(std::make_unique<flecs::world>())
     {
         ecs_world_client->set_context(&engine());

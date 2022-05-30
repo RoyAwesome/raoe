@@ -18,6 +18,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include <string>
 #include <string_view>
+#include <concepts>
 
 namespace RAOE::Resource
 {
@@ -39,6 +40,12 @@ namespace RAOE::Resource
         static std::string_view DefaultPrefix;
     private:
         std::string m_tag;
+    };
+
+    template<typename T>
+    concept tagged = requires(T t)
+    {
+        { t.tag() } -> std::convertible_to<const Tag&>;
     };
 }
 

@@ -20,9 +20,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Gears
 {
-    const std::string ConsoleGearName("Global::Console::ConsoleGear");
-    ConsoleGear::ConsoleGear(RAOE::Cogs::BaseCog& in_cog)    
-        : RAOE::Cogs::Gear(in_cog)
+    ConsoleGear::ConsoleGear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)    
+        : RAOE::Cogs::Gear(in_cog, in_name)
         , console_ptr(std::make_unique<RAOE::Console::DisplayConsole>(in_cog.engine()))
     {
     

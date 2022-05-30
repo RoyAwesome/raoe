@@ -14,20 +14,20 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
 
-#include "cogs/gear.hpp"
-#include "display_console.hpp"
+#include "cogs/gear_service.hpp"
+#include "resource/resource_service.hpp"
 
-namespace RAOE::Gears
+namespace RAOE::Service
 {
-    struct ConsoleGear : public RAOE::Cogs::Gear
-    {      
-        ConsoleGear(RAOE::Cogs::BaseCog&, std::string_view);
 
-        RAOE::Console::DisplayConsole* display_console() { return console_ptr.get(); }
-        
-    private:
-        std::unique_ptr<RAOE::Console::DisplayConsole> console_ptr;
-    };
+    void GearService::internal_register_gear(const std::shared_ptr<RAOE::Cogs::Gear>& in_gear)    
+    {   
+        using ResourceService = RAOE::Resource::Service;
+        if(std::shared_ptr<ResourceService> resource_service = engine().get_service<ResourceService>().lock())
+        {
+            resource_service->emplace_resource(in_gear->tag(), in_gear, RAOE::Resource::Tag("raoe:type/gear"));
+        }    
+    }
+
 }

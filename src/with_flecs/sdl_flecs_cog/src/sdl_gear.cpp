@@ -23,8 +23,8 @@ namespace RAOE::Gears
   
     struct SDLFLECSGear : public RAOE::Cogs::Gear
     {
-        SDLFLECSGear(RAOE::Cogs::BaseCog& in_cog)
-            : RAOE::Cogs::Gear(in_cog) 
+        SDLFLECSGear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)
+            : RAOE::Cogs::Gear(in_cog, in_name) 
         {}
         virtual void activated()
         {         

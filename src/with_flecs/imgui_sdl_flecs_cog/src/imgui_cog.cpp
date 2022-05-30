@@ -22,8 +22,8 @@ namespace RAOE::Gears
 {
     struct ImguiSdlFlecsGear : public RAOE::Cogs::Gear
     {
-        ImguiSdlFlecsGear(RAOE::Cogs::BaseCog& in_cog)
-            : RAOE::Cogs::Gear(in_cog)
+        ImguiSdlFlecsGear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)
+            : RAOE::Cogs::Gear(in_cog, in_name)
         {
 
         }

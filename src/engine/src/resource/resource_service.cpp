@@ -19,11 +19,23 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "engine.hpp"
 #include "resource/handle.hpp"
 #include "resource/iresource.hpp"
+#include "resource/resource_type.hpp"
 
 #include "console/command.hpp"
 
 namespace RAOE::Resource
 {
+    const Tag ResourceTypeTag("raoe:type/type");
+
+    Service::Service(RAOE::Engine& in_engine)
+        : IService(in_engine)
+    {
+        //Create the basic types that are always available to the resource system
+        create_resource_type(ResourceTypeTag);
+        create_resource_type(Tag("raoe:type/unknown"));
+        create_resource_type(Tag("raoe:type/cog"));
+        create_resource_type(Tag("raoe:type/gear"));
+    }
 
     std::shared_ptr<Handle> Service::get_resource(const Tag& tag)
     {
@@ -46,12 +58,33 @@ namespace RAOE::Resource
         return handle;
     }
 
-    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource)    
+    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource, Tag resource_type)    
     {
-        auto handle = find_or_create_handle(tag);       
+        auto handle = find_or_create_handle(tag);  
+        if(m_owned_resources.contains(resource_type))
+        {
+            handle->m_resource_type = resource_type;   
+        }
+        else
+        {
+            spdlog::warn("Tried to emplace resource with unknown type {}.  Defaulting to raoe:type/unknown", resource_type);
+        }
+  
         handle->m_resource = resource;
         //Pin the resource
         pin_resource(handle.get());
+
+        return handle;
+    }
+
+    std::weak_ptr<Handle> Service::create_resource_type(const Tag& tag)    
+    {  
+        auto handle = find_or_create_handle(tag);
+        std::shared_ptr<IResource> resource = std::make_shared<Type>(tag);
+        m_owned_resources.insert_or_assign(tag, resource);
+        handle->m_resource_type = ResourceTypeTag;
+        handle->m_resource = resource;
+        handle->pin();  
 
         return handle;
     }
@@ -68,7 +101,7 @@ namespace RAOE::Resource
             }
         }        
 
-        std::shared_ptr<Handle> handle = std::shared_ptr<Handle>(new Handle(*this, tag));
+        std::shared_ptr<Handle> handle = std::shared_ptr<Handle>(new Handle(*this, tag, Tag("raoe:type/unknown")));
         m_handle_map.insert_or_assign(tag, handle);
         return handle;
     }
@@ -96,16 +129,25 @@ namespace RAOE::Resource
     
     }
 
+    void Service::manage_resource(Tag tag, std::shared_ptr<IResource> resource, Tag resource_type)    
+    {   
+        auto handle = find_or_create_handle(tag);
+        m_owned_resources.insert_or_assign(tag, resource);
+        handle->m_resource_type = resource_type;
+        handle->m_resource = resource;
+        handle->pin();            
+    }
+
     void print_handle_information(Engine& engine)
     {
         if(std::shared_ptr<Service> resource_service = engine.get_service<Service>().lock())
         {
-            spdlog::info("   | {:<25}|{:^8}|{:^8}|", "Name", "Loaded", "Pinned");
+            spdlog::info("   | {:<25}|{:<25}|{:^8}|{:^8}|", "Name", "Type", "Loaded", "Pinned");
             for(const auto& [tag, handle] : resource_service->m_handle_map)
             {
                 if(auto strong_handle = handle.lock())
                 {
-                    spdlog::info("   | {:<25}|{:^8}|{:^8}|", tag, strong_handle->loaded(), resource_service->m_pinned_resources.contains(tag));
+                    spdlog::info("   | {:<25}|{:<25}|{:^8}|{:^8}|", tag, strong_handle->resource_type(), strong_handle->loaded(), resource_service->m_pinned_resources.contains(tag));
                 }            
             }
         }      

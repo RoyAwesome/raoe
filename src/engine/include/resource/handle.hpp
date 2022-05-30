@@ -37,6 +37,7 @@ namespace RAOE::Resource
         ~Handle();
 
         const Tag& tag() const { return m_tag; }
+        const Tag& resource_type() const { return m_resource_type; }
         RAOE::Engine& engine() const;
         Service* service() const { return &m_service; }
         bool loaded() const;
@@ -50,22 +51,25 @@ namespace RAOE::Resource
 
         void load_resource_synchronously() {} ;
     private:
-        Handle(Service& in_service, const Tag& in_tag)
+        Handle(Service& in_service, const Tag& in_tag, const Tag& in_type)
             : m_service(in_service)
             , m_tag(in_tag)
             , m_resource()
+            , m_resource_type(in_type)
         {            
         }
         
-        Handle(Service& in_service, const Tag& in_tag, std::weak_ptr<IResource> in_resource)
+        Handle(Service& in_service, const Tag& in_tag, std::weak_ptr<IResource> in_resource, const Tag& in_type)
             : m_service(in_service)
             , m_tag(in_tag)
             , m_resource(in_resource)
+            , m_resource_type(in_type)
         {
         }
         
         Service& m_service;
         Tag m_tag;
         std::weak_ptr<IResource> m_resource;
+        Tag m_resource_type;
     };
 }

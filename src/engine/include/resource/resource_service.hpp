@@ -33,23 +33,21 @@ namespace RAOE::Resource
     public:
         friend class Handle;
         friend void print_handle_information(Engine&);
-        Service(RAOE::Engine& in_engine)
-            : IService(in_engine)
-        {
-        }
+        Service(RAOE::Engine& in_engine);
 
         std::shared_ptr<Handle> get_resource(const Tag& tag);
         std::weak_ptr<Handle> get_resource_weak(const Tag& tag);
 
         std::shared_ptr<Handle> load_resource(const Tag& tag);
-        std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource);
+        std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource, Tag resource_type);
 
 
-
+        std::weak_ptr<Handle> create_resource_type(const Tag& tag);
     private:
         std::shared_ptr<Handle> find_or_create_handle(const Tag& tag);
         void pin_resource(Handle* handle);
         void on_handle_destroyed(Handle* destroying_handle);
+        void manage_resource(Tag tag, std::shared_ptr<IResource> resource, Tag resource_type);
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> m_handle_map;
         std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;

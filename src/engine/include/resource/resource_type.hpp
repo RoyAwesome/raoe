@@ -16,18 +16,28 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "cogs/gear.hpp"
-#include "display_console.hpp"
+#include "core.hpp"
+#include "resource/iresource.hpp"
+#include "resource/tag.hpp"
 
-namespace RAOE::Gears
+namespace RAOE::Resource
 {
-    struct ConsoleGear : public RAOE::Cogs::Gear
-    {      
-        ConsoleGear(RAOE::Cogs::BaseCog&, std::string_view);
+    extern const Tag ResourceTypeTag;
+    class Type : public IResource
+    {
+    public:
+        Type(const Tag& in_tag)
+            : m_type_tag(in_tag)
+        {            
+        }
 
-        RAOE::Console::DisplayConsole* display_console() { return console_ptr.get(); }
-        
+        const Tag& type_tag() const { return m_type_tag; }
+        const Tag& tag() const { return type_tag(); }
+
+        //BEGIN: IResource Interface
+        virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
+        //END: IResource Interface
     private:
-        std::unique_ptr<RAOE::Console::DisplayConsole> console_ptr;
+        Tag m_type_tag;
     };
 }

@@ -18,6 +18,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "core.hpp"
 #include "cogs/cog.hpp"
+#include "resource/iresource.hpp"
+#include "resource/tag.hpp"
 
 namespace RAOE
 {
@@ -26,14 +28,15 @@ namespace RAOE
 
 namespace RAOE::Cogs
 {  
-    class Gear
+    class Gear : public RAOE::Resource::IResource
     {
         Gear() = delete; //use the engine ctor
         Gear(const Gear&) = delete; //cant copy gears
         Gear(Gear&&) = delete; //can't move gears
     protected:
-        Gear(RAOE::Cogs::BaseCog& in_cog)
+        Gear(RAOE::Cogs::BaseCog& in_cog, std::string_view name)
             : m_cog(in_cog)
+            , m_tag(in_cog.tag().prefix(), "gear/" + std::string(name))
         {
 
         }
@@ -45,12 +48,18 @@ namespace RAOE::Cogs
         RAOE::Engine& engine() const { return m_cog.engine(); }
         const RAOE::Cogs::BaseCog& cog() const { return m_cog; }
 
+        //BEGIN: IResource Interface
+        virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
+        //END: IResource Interface
+        
+        const RAOE::Resource::Tag& tag() const { return m_tag; }
     private:
         RAOE::Cogs::BaseCog& m_cog;
+        RAOE::Resource::Tag m_tag;
     };
 
     template<typename T>
-    concept is_gear = std::constructible_from<T, RAOE::Cogs::BaseCog&> && std::derived_from<T, RAOE::Cogs::Gear>;
+    concept is_gear = std::constructible_from<T, RAOE::Cogs::BaseCog&, std::string_view> && std::derived_from<T, RAOE::Cogs::Gear>;
 }
 
 #include "cogs/gear_service.hpp"
@@ -63,6 +72,6 @@ namespace RAOE::Cogs
 #define RAOE_DEFINE_GEAR(GearName, GearClass) \
     RAOE_GEAR_GENERATE_FUNC_DECL(GearName) \
     { \
-        owning_cog.engine().get_service<RAOE::Service::GearService>().lock()->register_gear<GearClass>(owning_cog); \
+        owning_cog.engine().get_service<RAOE::Service::GearService>().lock()->register_gear<GearClass>(owning_cog, #GearName); \
     }
 

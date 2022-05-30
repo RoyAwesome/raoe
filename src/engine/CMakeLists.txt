@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME}
     "src/console/console.cpp"
     "src/cogs/cog.cpp"
     "src/cogs/cog_service.cpp"
+    "src/cogs/gear_service.cpp"
     "src/resource/tag.cpp"
     "src/resource/resource_service.cpp"
     "src/resource/handle.cpp"
