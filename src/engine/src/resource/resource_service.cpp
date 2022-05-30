@@ -100,15 +100,14 @@ namespace RAOE::Resource
     {
         if(std::shared_ptr<Service> resource_service = engine.get_service<Service>().lock())
         {
-            spdlog::info("Resource Service Info");
+            spdlog::info("   | {:<25}|{:^8}|{:^8}|", "Name", "Loaded", "Pinned");
             for(const auto& [tag, handle] : resource_service->m_handle_map)
             {
                 if(auto strong_handle = handle.lock())
                 {
-                    spdlog::info("\t{} - (loaded? {} pinned? {})", tag, strong_handle->loaded(), resource_service->m_pinned_resources.contains(tag));
+                    spdlog::info("   | {:<25}|{:^8}|{:^8}|", tag, strong_handle->loaded(), resource_service->m_pinned_resources.contains(tag));
                 }            
             }
-            spdlog::info("End Resource Service Info");
         }      
         else
         {            
@@ -121,7 +120,4 @@ namespace RAOE::Resource
         "Prints resources to the console, in the format [Tag] - [LoadStatus]",
         print_handle_information
     );
-
-    
-
 }
