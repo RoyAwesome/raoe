@@ -21,6 +21,7 @@ enable_testing()
 
 add_executable(${PROJECT_NAME}
     "resource_tag_test.cpp"
+    "resource_locator_test.cpp"
 )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 

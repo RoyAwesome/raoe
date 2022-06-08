@@ -126,14 +126,18 @@ namespace RAOE
 
 
     Engine::Engine(int argv, char** argc)
+        : Engine()
     {
         init_service<RAOE::Service::TickService>();
         init_service<RAOE::Service::GearService>();
-        init_service<RAOE::Resource::Service>();
+        init_service<RAOE::Resource::Service>();        
+    }
 
+    Engine::Engine()    
+    {
+        init_service<RAOE::Service::CogService>();
 
-        std::weak_ptr<RAOE::Service::CogService> weak_cog_service = init_service<RAOE::Service::CogService>();
-        if(auto cog_service = weak_cog_service.lock())
+        if(auto cog_service = get_service<RAOE::Service::CogService>().lock())
         {
             //At this point, there are no cogs in the registry.  We must create the special engine cog here with it's own gears
             //and activate them. 
@@ -141,6 +145,7 @@ namespace RAOE
             cog_service->transition_cog<EngineCog>(RAOE::Cogs::ECogStatus::PreActivate, TransitionFunc::register_gears);
             cog_service->transition_cog<EngineCog>(RAOE::Cogs::ECogStatus::Activated, TransitionFunc::activate_gears);
         }
+    
     }
 
     Engine::~Engine()

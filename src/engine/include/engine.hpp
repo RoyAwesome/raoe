@@ -39,14 +39,16 @@ namespace RAOE
 
     class Engine
     {     
-    public: 
-        Engine() = delete;
-        Engine(const Engine&) = delete;
+    public:     
+       Engine(const Engine&) = delete;
         Engine(Engine&&) = delete;
 
         ~Engine();
     protected:
         Engine(int argv, char** argc);
+        struct FromTest {};
+        Engine(FromTest) : Engine() { }
+
         //Main calls Init and Run (but nobody else can).  So it's friend.  
         friend int ::main(int, char**);
         friend class CogManager;
@@ -54,6 +56,7 @@ namespace RAOE
         void Startup();
         bool Run();
         void Shutdown();
+
     public:
 
         template<is_service T>
@@ -74,6 +77,10 @@ namespace RAOE
             services.erase<T>();
         }
     private:
+        Engine(); //Base Ctor, must be called by one of the protected ctors.  
+        
         raoe::container::subclass_map<RAOE::Service::IService> services;
     };
+
+
 }
