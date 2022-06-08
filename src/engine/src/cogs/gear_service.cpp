@@ -26,7 +26,7 @@ namespace RAOE::Service
         using ResourceService = RAOE::Resource::Service;
         if(std::shared_ptr<ResourceService> resource_service = engine().get_service<ResourceService>().lock())
         {
-            resource_service->emplace_resource(in_gear->tag(), in_gear, RAOE::Resource::Tag("raoe:type/gear"));
+            resource_service->emplace_resource(in_gear->tag(), in_gear, RAOE::Resource::TypeTags::Gear);
         }    
     }
 

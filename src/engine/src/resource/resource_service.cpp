@@ -25,16 +25,23 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Resource
 {
-    const Tag ResourceTypeTag("raoe:type/type");
+    namespace TypeTags
+    {
+        const Tag Type("raoe:type/type");
+        const Tag Unknown("raoe:type/unknown");
+        const Tag Cog("raoe:type/cog");
+        const Tag Gear("raoe:type/gear");
+    }
+
 
     Service::Service(RAOE::Engine& in_engine)
         : IService(in_engine)
     {
         //Create the basic types that are always available to the resource system
-        create_resource_type(ResourceTypeTag);
-        create_resource_type(Tag("raoe:type/unknown"));
-        create_resource_type(Tag("raoe:type/cog"));
-        create_resource_type(Tag("raoe:type/gear"));
+        create_resource_type(TypeTags::Type);
+        create_resource_type(TypeTags::Unknown);
+        create_resource_type(TypeTags::Cog);
+        create_resource_type(TypeTags::Gear);
     }
 
     std::shared_ptr<Handle> Service::get_resource(const Tag& tag)
@@ -82,7 +89,7 @@ namespace RAOE::Resource
         auto handle = find_or_create_handle(tag);
         std::shared_ptr<IResource> resource = std::make_shared<Type>(tag);
         m_owned_resources.insert_or_assign(tag, resource);
-        handle->m_resource_type = ResourceTypeTag;
+        handle->m_resource_type = TypeTags::Type;
         handle->m_resource = resource;
         handle->pin();  
 

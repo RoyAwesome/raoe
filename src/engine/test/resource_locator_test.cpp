@@ -39,8 +39,21 @@ TEST(Locator, GenericTest)
 
     if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
     {        
-        std::filesystem::path p = RAOE::Resource::default_locator(*(resource_service.get()), RAOE::Resource::Tag("raoe:texture/block"));
+        RAOE::Resource::DefaultLocator default_locator;
+        std::filesystem::path p = default_locator(*(resource_service.get()), RAOE::Resource::Tag("raoe:testfile"));
         spdlog::info("{}", p.string());
     }
     
+}
+
+TEST(Locator, ResourceResolverTest)
+{
+    spdlog::info(std::filesystem::current_path().string());
+    using Engine = ResourceLocatorTest::Engine;
+    Engine e;
+
+    if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
+    {
+
+    }
 }

@@ -22,7 +22,6 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Resource
 {
-    extern const Tag ResourceTypeTag;
     class Type : public IResource
     {
     public:

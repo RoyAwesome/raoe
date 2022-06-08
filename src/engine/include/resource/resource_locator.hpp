@@ -16,8 +16,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "resource_service.hpp"
-#include "tag.hpp"
+#include "resource/resource_service.hpp"
+#include "resource/tag.hpp"
+#include "resource/handle.hpp"
 #include <filesystem>
 #include <string_view>
 
@@ -29,15 +30,59 @@ namespace RAOE::Resource
         { t(s, tag) } -> std::same_as<std::filesystem::path>;
     };
 
-    inline std::filesystem::path default_locator(Service& service, Tag tag)
+    struct DefaultLocator
     {
-        using namespace std::literals::string_view_literals;
-        std::string_view cog_folder = tag.prefix();
-        if(cog_folder == "raoe"sv)
+        std::filesystem::path operator()(Service& service, Tag tag)
         {
-            cog_folder = "engine"sv;
+            using namespace std::literals::string_view_literals;
+            std::string_view cog_folder = tag.prefix();
+            if(cog_folder == "raoe"sv)
+            {
+                cog_folder = "engine"sv;
+            }
+            return std::filesystem::path(cog_folder) / std::filesystem::path(tag.identifier());
         }
-        return std::filesystem::path(cog_folder) / std::filesystem::path(tag.identifier()));
-    }
+    };
+
+    struct ResolvedResource
+    {
+        std::filesystem::path resolved_path;
+        RAOE::Resource::Tag filetype;
+    };
+
+    template<Locator L = DefaultLocator>
+    class ResourceResolver
+    {
+    public:
+        void operator()(std::shared_ptr<Handle> handle, std::output_iterator<ResolvedResource> auto out_itr)
+        {
+            std::filesystem::path unresolved_path = L(*handle->service(), handle->tag());
+
+            std::filesystem::path parent_path = unresolved_path.parent_path();
+            if(!std::filesystem::is_directory(parent_path))
+            {
+                return;
+            }
+
+            //search up all the files at the unresolved path's directory
+            for(auto file : std::filesystem::directory_iterator(parent_path))
+            {
+                if(!file.is_regular_file())
+                {
+                    continue;                   
+                }
+                if(file.path().filename() != unresolved_path.filename())
+                {
+                    continue;
+                }
+                auto extension = file.path().extension();
+
+                //Find the file type that matches this extension
+
+                //build and return the resolved info
+                *(++out_itr) = ResolvedResource { file.path(), TypeTags::Unknown };
+            }
+        }
+    };
 
 }

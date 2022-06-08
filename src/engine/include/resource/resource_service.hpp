@@ -28,6 +28,14 @@ namespace RAOE::Resource
 {
     class Handle;
 
+    namespace TypeTags
+    {   
+        extern const Tag Type;
+        extern const Tag Unknown;
+        extern const Tag Cog;
+        extern const Tag Gear;
+    }
+
     class Service : public RAOE::Service::IService
     {
     public:

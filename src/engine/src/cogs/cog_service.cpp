@@ -49,7 +49,7 @@ namespace RAOE::Service
         {
             if(std::shared_ptr<BaseCog> cog = cog_ptr.lock())
             {                
-                resource_service->emplace_resource(cog->tag(), cog, RAOE::Resource::Tag("raoe:type/cog"));
+                resource_service->emplace_resource(cog->tag(), cog, RAOE::Resource::TypeTags::Cog);
             }
         }
     }
