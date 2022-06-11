@@ -54,6 +54,15 @@ TEST(Locator, ResourceResolverTest)
 
     if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
     {
+        std::vector<RAOE::Resource::ResolvedResource> resolved_resources;
 
+        RAOE::Resource::ResourceResolver resolver {};
+        std::shared_ptr resource_handle = resource_service->get_resource(RAOE::Resource::Tag("raoe:test/testasset"));
+        resolver(resource_handle, std::back_inserter(resolved_resources));
+        spdlog::info("Num Resources {}", resolved_resources.size());
+        for(auto& res_resource : resolved_resources)
+        {
+            spdlog::info(res_resource.resolved_path.string());
+        }
     }
 }

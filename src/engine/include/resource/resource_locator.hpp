@@ -56,22 +56,25 @@ namespace RAOE::Resource
     public:
         void operator()(std::shared_ptr<Handle> handle, std::output_iterator<ResolvedResource> auto out_itr)
         {
-            std::filesystem::path unresolved_path = L(*handle->service(), handle->tag());
+            L locator_func {};
+            std::filesystem::path unresolved_path = locator_func(*handle->service(), handle->tag());
 
             std::filesystem::path parent_path = unresolved_path.parent_path();
-            if(!std::filesystem::is_directory(parent_path))
+
+            std::filesystem::path actual_path = std::filesystem::current_path() / "assets" / parent_path;
+            if(!std::filesystem::is_directory(actual_path))
             {
                 return;
             }
 
             //search up all the files at the unresolved path's directory
-            for(auto file : std::filesystem::directory_iterator(parent_path))
+            for(auto file : std::filesystem::directory_iterator(actual_path))
             {
                 if(!file.is_regular_file())
                 {
                     continue;                   
                 }
-                if(file.path().filename() != unresolved_path.filename())
+                if(file.path().stem() != unresolved_path.stem())
                 {
                     continue;
                 }
