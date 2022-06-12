@@ -17,8 +17,14 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "resource/resource_locator.hpp"
+#include "resource/locator.hpp"
 #include "engine.hpp"
+
+#include "resource/assets/text_asset.hpp"
+#include <fstream>
+#include <string_view>
+
+using namespace std::literals::string_view_literals;
 
 namespace ResourceLocatorTest
 {
@@ -59,10 +65,45 @@ TEST(Locator, ResourceResolverTest)
         RAOE::Resource::ResourceResolver resolver {};
         std::shared_ptr resource_handle = resource_service->get_resource(RAOE::Resource::Tag("raoe:test/testasset"));
         resolver(resource_handle, std::back_inserter(resolved_resources));
-        spdlog::info("Num Resources {}", resolved_resources.size());
+
+        EXPECT_EQ(resolved_resources.size(), 1);
+
         for(auto& res_resource : resolved_resources)
         {
             spdlog::info(res_resource.resolved_path.string());
         }
     }
+}
+
+TEST(Loader, ResourceResolverTest)
+{
+    std::filesystem::path resolved_path;
+
+    using Engine = ResourceLocatorTest::Engine;
+    Engine e;
+    if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
+    {
+        std::vector<RAOE::Resource::ResolvedResource> resolved_resources;
+
+        RAOE::Resource::ResourceResolver resolver {};
+        std::shared_ptr resource_handle = resource_service->get_resource(RAOE::Resource::Tag("raoe:test/testasset"));
+        resolver(resource_handle, std::back_inserter(resolved_resources));
+
+        if(resolved_resources.size() == 1)
+        {
+            resolved_path = resolved_resources[0].resolved_path;
+        }       
+    }
+
+    RAOE::Resource::Asset::TextAssetLoader loader;
+
+    std::ifstream file(resolved_path.string());
+
+    std::shared_ptr<RAOE::Resource::Asset::TextAsset> resource = loader.load_resource(file);
+
+    file.close();
+
+    spdlog::info(resource->contents());
+
+    EXPECT_EQ(resource->contents(), "hello world"sv);
 }

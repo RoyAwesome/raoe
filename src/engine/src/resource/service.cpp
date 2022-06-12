@@ -14,14 +14,16 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#include "resource/resource_service.hpp"
+#include "resource/service.hpp"
 #include "core.hpp"
 #include "engine.hpp"
 #include "resource/handle.hpp"
 #include "resource/iresource.hpp"
-#include "resource/resource_type.hpp"
+#include "resource/type.hpp"
 
 #include "console/command.hpp"
+
+#include "resource/assets/text_asset.hpp"
 
 namespace RAOE::Resource
 {
@@ -31,6 +33,11 @@ namespace RAOE::Resource
         const Tag Unknown("raoe:type/unknown");
         const Tag Cog("raoe:type/cog");
         const Tag Gear("raoe:type/gear");
+        const Tag Loader("raoe:type/loader");
+    }
+    namespace Asset::Tags
+    {
+        const Tag TextLoader("raoe:loader/text");
     }
 
 
@@ -42,6 +49,11 @@ namespace RAOE::Resource
         create_resource_type(TypeTags::Unknown);
         create_resource_type(TypeTags::Cog);
         create_resource_type(TypeTags::Gear);
+        create_resource_type(TypeTags::Loader);
+
+        //emplace the basic loaders that are always available
+        emplaced_owned_resource(Asset::Tags::TextLoader, std::static_pointer_cast<IResource>(std::make_shared<Asset::TextAssetLoader>()), TypeTags::Loader)->pin();
+        
     }
 
     std::shared_ptr<Handle> Service::get_resource(const Tag& tag)
@@ -82,6 +94,12 @@ namespace RAOE::Resource
         pin_resource(handle.get());
 
         return handle;
+    }
+
+    std::shared_ptr<Handle> Service::emplaced_owned_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type)    
+    {  
+        m_owned_resources.insert_or_assign(tag, resource);
+        return emplace_resource(tag, resource, resource_type);    
     }
 
     std::weak_ptr<Handle> Service::create_resource_type(const Tag& tag)    

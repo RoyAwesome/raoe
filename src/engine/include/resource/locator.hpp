@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "resource/resource_service.hpp"
+#include "resource/service.hpp"
 #include "resource/tag.hpp"
 #include "resource/handle.hpp"
 #include <filesystem>

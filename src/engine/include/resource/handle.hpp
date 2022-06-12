@@ -42,14 +42,14 @@ namespace RAOE::Resource
         Service* service() const { return &m_service; }
         bool loaded() const;
 
-         std::weak_ptr<IResource> get() const { return m_resource; }
+        std::weak_ptr<IResource> get() const { return m_resource; }
 
         template<std::derived_from<IResource> T>
         std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get()); }
 
         void pin();
 
-        void load_resource_synchronously() {} ;
+        void load_resource_synchronously();
     private:
         Handle(Service& in_service, const Tag& in_tag, const Tag& in_type)
             : m_service(in_service)

@@ -14,20 +14,23 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+#pragma once
 
-#include "cogs/gear_service.hpp"
-#include "resource/service.hpp"
+#include "resource/iresource.hpp"
+#include <vector>
+#include <string>
+#include <memory>
 
-namespace RAOE::Service
+namespace RAOE::Resource
 {
-
-    void GearService::internal_register_gear(const std::shared_ptr<RAOE::Cogs::Gear>& in_gear)    
-    {   
-        using ResourceService = RAOE::Resource::Service;
-        if(std::shared_ptr<ResourceService> resource_service = engine().get_service<ResourceService>().lock())
-        {
-            resource_service->emplace_resource(in_gear->tag(), in_gear, RAOE::Resource::TypeTags::Gear);
-        }    
-    }
-
+    template<is_resource T>
+    class ILoader : public IResource
+    {
+    public:
+        virtual ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }
+        virtual std::shared_ptr<T> load_resource(const std::istream& data_stream) = 0;
+    private:
+        //File extensions for this loader
+        std::vector<std::string> m_extensions;
+    };
 }

@@ -17,7 +17,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "resource/handle.hpp"
 #include "resource/iresource.hpp"
-#include "resource/resource_service.hpp"
+#include "resource/service.hpp"
 #include "engine.hpp"
 
 namespace RAOE::Resource
@@ -34,6 +34,12 @@ namespace RAOE::Resource
     void Handle::pin()    
     {
         service()->pin_resource(this);
+    }
+
+    void Handle::load_resource_synchronously()    
+    {   
+        
+    
     }
 
     Handle::~Handle()    

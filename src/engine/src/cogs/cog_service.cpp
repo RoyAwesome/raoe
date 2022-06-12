@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "cogs/cog_service.hpp"
 #include "engine.hpp"
-#include "resource/resource_service.hpp"
+#include "resource/service.hpp"
 
 namespace RAOE::Service
 {

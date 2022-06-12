@@ -34,6 +34,7 @@ namespace RAOE::Resource
         extern const Tag Unknown;
         extern const Tag Cog;
         extern const Tag Gear;
+        extern const Tag Loader;
     }
 
     class Service : public RAOE::Service::IService
@@ -48,6 +49,7 @@ namespace RAOE::Resource
 
         std::shared_ptr<Handle> load_resource(const Tag& tag);
         std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource, Tag resource_type);
+        std::shared_ptr<Handle> emplaced_owned_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type);
 
 
         std::weak_ptr<Handle> create_resource_type(const Tag& tag);

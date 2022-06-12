@@ -36,6 +36,9 @@ namespace RAOE::Resource
     private:
     };
 
+    template<typename T>
+    concept is_resource = std::derived_from<T, IResource>;
+
     //template t resource loader
     //
 }
