@@ -28,22 +28,18 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 namespace RAOE::Console
 {
     const int32 Max_History = 32;
+    const int32 Ringbuffer_Size = 40;
 
     DisplayConsole::DisplayConsole(RAOE::Engine& in_engine)
         : m_engine(in_engine)
+        , history_pos(-1)
     {
-        ring_buffer = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(40);
+        ring_buffer = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(Ringbuffer_Size);
         spdlog::default_logger()->sinks().push_back(ring_buffer);
 
         history.reserve(Max_History);
-        history_pos = -1;
 
-        input_buffer.reserve(128);
-    }
-
-    DisplayConsole::~DisplayConsole()    
-    {
-        //Remove the ring buffer sink
+        input_buffer.reserve(128); //NOLINT Magic Number.  128 is a decent number, and we don't use it anywhere else
     }
 
     void DisplayConsole::Draw(const std::string& title, bool* p_open)
@@ -98,7 +94,7 @@ namespace RAOE::Console
             input_text_flags, 
             [](ImGuiInputTextCallbackData* data) -> int 
             {
-                DisplayConsole* console = static_cast<DisplayConsole*>(data->UserData);
+                auto* console = static_cast<DisplayConsole*>(data->UserData);
                 switch(data->EventFlag)
                 {
                 case ImGuiInputTextFlags_CallbackHistory:
@@ -108,7 +104,7 @@ namespace RAOE::Console
                     {
                         if(history_pos == -1)
                         {
-                            history_pos = console->history.size() - 1;
+                            history_pos = (int32)console->history.size() - 1;
                         }
                         else if(history_pos > 0)
                         {
@@ -236,7 +232,10 @@ namespace RAOE::Console
 
         ImGui::SetItemDefaultFocus();
         if (reclaim_focus)
+        {
             ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+        }
+
 
         ImGui::End();
     }

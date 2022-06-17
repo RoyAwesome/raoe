@@ -31,7 +31,7 @@ namespace RAOE::Console
     {
     public:
         DisplayConsole(RAOE::Engine&);
-        ~DisplayConsole();
+        ~DisplayConsole() = default;
 
         void Draw(const std::string& title, bool* p_open);
 

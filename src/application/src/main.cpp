@@ -21,7 +21,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "client_app_module.hpp"
 
 #ifndef RAOE_STATIC_COGS
-#define RAOE_STATIC_COGS 1 //TODO: get cmake to produce this.  this should be default 0
+#define RAOE_STATIC_COGS 1 //NOLINT TODO: get cmake to produce this.  this should be default 0
 #endif
 
 #if RAOE_STATIC_COGS
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
             using FlecsGear = RAOE::Gears::FlecsGear;            
             if(std::shared_ptr<FlecsGear> flecs_gear = gear_service->get_gear<FlecsGear>().lock())
             {
-                flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(1600, 900), glm::i8vec4(0, 0, 0, 0)});
+                flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(1600, 900), glm::i8vec4(0, 0, 0, 0)}); //NOLINT complains about the resolution.
             }
             else
             {
