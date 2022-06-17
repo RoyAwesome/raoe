@@ -23,6 +23,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <concepts>
 #include "resource/iresource.hpp"
 #include "resource/tag.hpp"
+#include "engine_fwd.hpp"
 
 namespace RAOE
 {

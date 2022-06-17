@@ -44,6 +44,7 @@ namespace RAOE::Console
         virtual std::string_view name() const = 0;
         virtual std::string_view description() const = 0;
         virtual EConsoleFlags flags() const = 0;
+        virtual ~IConsoleElement() = default;
 
         enum class EExecuteError : uint8
         {

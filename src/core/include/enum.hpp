@@ -86,12 +86,12 @@ namespace raoe::core
     template<is_integral_enum Enum>
     constexpr bool add_flags(Enum& flags, Enum flags_to_add)
     {
-        flags |= flags_to_add;
+        return flags |= flags_to_add;
     }
 
     template<is_integral_enum Enum>
     constexpr bool remove_flags(Enum& flags, Enum flags_to_remove)
     {
-        flags &= ~flags_to_remove;
+        return flags &= ~flags_to_remove;
     }
 }

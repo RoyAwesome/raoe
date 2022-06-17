@@ -16,7 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
-#include "Inline.hpp"
+#include "inline.hpp"
 #include <source_location>
 #include "spdlog/spdlog.h"
 

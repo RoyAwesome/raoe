@@ -21,6 +21,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "core.hpp"
 #include "services/iservice.hpp"
 #include "container/subclass_map.hpp"
+#include "engine_fwd.hpp"
 
 int main(int, char**);
 
@@ -28,14 +29,7 @@ namespace RAOE
 {
     class Engine;
 
-    template<typename T>
-    concept has_engine_ref = std::constructible_from<T, RAOE::Engine&> && requires(T t) 
-    {
-        { t.engine() } -> std::same_as<RAOE::Engine&>;
-    };
 
-    template<typename Service>
-    concept is_service = std::derived_from<Service, RAOE::Service::IService> && has_engine_ref<Service>;
 
     class Engine
     {     

@@ -38,7 +38,7 @@ namespace RAOE::Service
         void request_exit() { exit_requested = true; }
         bool should_exit() const { return exit_requested; }
 
-        friend class Engine;
+        friend class RAOE::Engine;
     private:
         void run_frame()
         {
