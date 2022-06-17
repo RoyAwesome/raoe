@@ -29,8 +29,8 @@ namespace RAOE::Resource
         explicit Tag(std::string_view in_tag);
         Tag(std::string_view prefix, std::string_view path);
 
-        std::string_view prefix() const;
-        std::string_view identifier() const;
+        [[nodiscard]] std::string_view prefix() const;
+        [[nodiscard]] std::string_view identifier() const;
 
         auto operator<=>(const Tag& rhs) const = default;
 

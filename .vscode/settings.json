@@ -126,6 +126,7 @@
         "performance-*",
         "readability-*", 
         "-readability-uppercase-literal-suffix",
+        "-readability-identifier-length",
         "portability-*",
         "bugprone-*",
         "-bugprone-exception-escape"

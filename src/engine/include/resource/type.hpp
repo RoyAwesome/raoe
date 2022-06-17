@@ -25,16 +25,23 @@ namespace RAOE::Resource
     class Type : public IResource
     {
     public:
-        Type(const Tag& in_tag)
-            : m_type_tag(in_tag)
+        Type(Tag in_tag)
+            : m_type_tag(std::move(in_tag))
         {            
         }
+        Type() = delete;
+        Type(const Type&) = default;
+        Type(Type&&) = default;
+        virtual ~Type() = default;
 
-        const Tag& type_tag() const { return m_type_tag; }
-        const Tag& tag() const { return type_tag(); }
+        Type& operator=(const Type&) = default;
+        Type& operator=(Type&&) = default;
+
+        [[nodiscard]] const Tag& type_tag() const { return m_type_tag; }
+        [[nodiscard]] const Tag& tag() const { return type_tag(); }
 
         //BEGIN: IResource Interface
-        virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
+        [[nodiscard]] RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
         //END: IResource Interface
     private:
         Tag m_type_tag;
