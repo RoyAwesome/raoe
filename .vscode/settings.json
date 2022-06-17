@@ -94,7 +94,8 @@
         "future": "cpp",
         "any": "cpp",
         "bitset": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "resumable": "cpp"
     },
     "editor.tokenColorCustomizations": {
         "textMateRules": [

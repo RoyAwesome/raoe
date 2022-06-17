@@ -34,36 +34,41 @@ namespace RAOE::Resource
     public:
         friend class Service;
 
+        Handle(const Handle&) = delete; //Handles cannot be copied.  They are passed around as shared pointers
+        Handle& operator=(const Handle&) = delete; //Handles cannot be copied.  They are passed around as shared pointers
+        
+        Handle(Handle&&) = delete; //Handles cannot be moved.  They are passed around as shared pointers       
+        Handle& operator=(Handle&&) = delete; //Handles cannot be moved.  They are passed around as shared pointers
+
         ~Handle();
 
-        const Tag& tag() const { return m_tag; }
-        const Tag& resource_type() const { return m_resource_type; }
-        RAOE::Engine& engine() const;
-        Service* service() const { return &m_service; }
-        bool loaded() const;
+        [[nodiscard]] const Tag& tag() const { return m_tag; }
+        [[nodiscard]] const Tag& resource_type() const { return m_resource_type; }
+        [[nodiscard]] RAOE::Engine& engine() const;
+        [[nodiscard]] Service* service() const { return &m_service; }
+        [[nodiscard]] bool loaded() const;
 
-        std::weak_ptr<IResource> get() const { return m_resource; }
+        [[nodiscard]] std::weak_ptr<IResource> get() const { return m_resource; }
 
         template<std::derived_from<IResource> T>
-        std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get()); }
+        [[nodiscard]] std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get()); }
 
         void pin();
 
         void load_resource_synchronously();
     private:
-        Handle(Service& in_service, const Tag& in_tag, const Tag& in_type)
+        Handle(Service& in_service, Tag in_tag, Tag in_type)
             : m_service(in_service)
-            , m_tag(in_tag)
-            , m_resource()
-            , m_resource_type(in_type)
+            , m_tag(std::move(in_tag))
+            , m_resource_type(std::move(in_type))
         {            
         }
         
-        Handle(Service& in_service, const Tag& in_tag, std::weak_ptr<IResource> in_resource, const Tag& in_type)
+        Handle(Service& in_service, Tag in_tag, std::weak_ptr<IResource> in_resource, Tag in_type)
             : m_service(in_service)
-            , m_tag(in_tag)
-            , m_resource(in_resource)
-            , m_resource_type(in_type)
+            , m_tag(std::move(in_tag))
+            , m_resource(std::move(in_resource))
+            , m_resource_type(std::move(in_type))
         {
         }
         
