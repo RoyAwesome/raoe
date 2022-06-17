@@ -19,6 +19,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <tuple>
 #include <cctype>
 #include <iterator>
+#include <functional>
 #include "types.hpp"
 #include "from_string.hpp"
 
@@ -84,8 +85,6 @@ namespace raoe::core::parse
 
                 //substring from start to cursor, add it to the out iterator   
                 *out_itr++ = from.substr(start, cursor - start);  
-
-                 
             }  
         }
 

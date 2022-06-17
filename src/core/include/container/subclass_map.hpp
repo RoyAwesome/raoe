@@ -74,7 +74,7 @@ namespace raoe::container
         {
             if(contains<T>())
             {
-                return nullptr;
+                return std::weak_ptr<T>();
             }
             auto [itr, success] = storage.emplace(typeid(T), std::make_shared<T>());
             return success ? std::dynamic_pointer_cast<T>((*itr).second) : nullptr;
@@ -95,7 +95,7 @@ namespace raoe::container
         std::weak_ptr<BaseClass> find(const std::type_info& type_info)
         {
             auto itr = storage.find(type_info);
-            return itr != storage.end() ? (*itr).second.get() : nullptr;
+            return itr != storage.end() ? (*itr).second : std::weak_ptr<BaseClass>();
         }
 
         template<std::derived_from<BaseClass> T>

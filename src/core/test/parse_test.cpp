@@ -30,7 +30,8 @@ TEST(LineParse, TestOneArgument)
     std::string_view input_string = "one"sv;
 
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv));
+    auto matching_vector = std::vector<std::string_view>{"one"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 //Take in a string with only whitespace, ensure that the return value is both elements
@@ -38,69 +39,84 @@ TEST(LineParse, TwoArguments_OnlyWhitespace)
 {
     std::string_view input_string = "one two"sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv, "two"sv));
+    auto matching_vector = std::vector<std::string_view>{"one"sv, "two"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, TenArguments_OnlyWhitespace)
 {
     std::string_view input_string = "one two three four five 6 7 eight 9 ten"sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv, "two"sv, "three"sv, "four"sv, "five"sv, "6"sv, "7"sv, "eight"sv, "9"sv, "ten"sv));
+    auto matching_vector = std::vector<std::string_view>{"one"sv, "two"sv, "three"sv, "four"sv, "five"sv, "6"sv, "7"sv, "eight"sv, "9"sv, "ten"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, TwoArguments_WhitespaceStart_OnlyWhitespace)
 {
     std::string_view input_string = " one two"sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv, "two"sv));
+    auto matching_vector = std::vector<std::string_view>{"one"sv, "two"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, TwoArguments_LotsOfWhitespaceBewtween_OnlyWhitespace)
 {
     std::string_view input_string = "one       two"sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv, "two"sv));
+
+    auto matching_vector = std::vector<std::string_view>{"one"sv, "two"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, TwoArguments_WhitespaceStart_WhitespaceEnd_OnlyWhitespace)
 {
     std::string_view input_string = " one two "sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv, "two"sv));
+        auto matching_vector = std::vector<std::string_view>{"one"sv, "two"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, OneArgument_Quotes)
 {
     std::string_view input_string = "\"one\""sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one"sv));
+
+    auto matching_vector = std::vector<std::string_view>{"one"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, OneArgument_InQuotes_WhitespaceInQuotes)
 {
     std::string_view input_string = "\"one two\""sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one two"sv));
+    auto matching_vector = std::vector<std::string_view>{"one two"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, Two_InQuotes_WhitespaceInQuotes_SecondArgument_WithWhitespace)
 {
     std::string_view input_string = "\"one two\" three"sv;
-    auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one two"sv, "three"sv));
+    auto results = raoe::core::parse::_::parse_split(input_string);   
+
+    auto matching_vector = std::vector<std::string_view>{"one two"sv, "three"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, Two_InQuotes_EscapedQuoteInQuotes)
 {
     std::string_view input_string = "\"one \\\"two\""sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one \\\"two"sv));
+
+    auto matching_vector = std::vector<std::string_view>{"one \\\"two"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 
 TEST(LineParse, ThreeArguments_FirstAndThirdInQuotes_WhitespaceBetween)
 {
     std::string_view input_string = "\"one two\" three \"four five\""sv;
     auto results = raoe::core::parse::_::parse_split(input_string);
-    ASSERT_THAT(results, testing::ElementsAre("one two"sv, "three"sv, "four five"sv));
+
+    auto matching_vector = std::vector<std::string_view>{"one two"sv, "three"sv, "four five"sv};
+    EXPECT_EQ(results, matching_vector);
 }
 

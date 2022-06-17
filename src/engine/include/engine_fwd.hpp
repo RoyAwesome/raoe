@@ -16,6 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #pragma once
 
+#include <concepts>
 
 namespace RAOE
 {

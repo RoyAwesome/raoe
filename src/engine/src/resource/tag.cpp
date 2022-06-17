@@ -27,15 +27,15 @@ namespace RAOE::Resource
     Tag::Tag(std::string_view in_tag)
         : m_tag(in_tag)
     {        
-        const bool has_colon_no_prefix = !m_tag.starts_with(":") && prefix().length() == 0;
-        const bool has_no_colon =  m_tag.find_first_of(":") == std::string::npos;
+        const bool has_colon_no_prefix = !m_tag.starts_with(':') && prefix().length() == 0;
+        const bool has_no_colon =  m_tag.find_first_of(':') == std::string::npos;
         if(has_no_colon || has_colon_no_prefix)
         {
             m_tag =  fmt::format("{}:{}", DefaultPrefix, m_tag);
         }     
         //Validate the prefix
         {        
-            auto colon_pos = m_tag.find_first_of(":");         
+            auto colon_pos = m_tag.find_first_of(':');         
             auto prefix_matcher = ctre::match<"[a-zA-Z0-9_\\-\\.]*$">;
             if(!prefix_matcher(m_tag.begin(), m_tag.begin() + colon_pos))
             {
@@ -46,7 +46,7 @@ namespace RAOE::Resource
 
         //Validate the identifier
         {
-            auto colon_pos = m_tag.find_first_of(":");           
+            auto colon_pos = m_tag.find_first_of(':');           
             auto ident_matcher = ctre::match<"[a-zA-Z0-9_\\-\\.\\/]*$">;
 
             if(!ident_matcher(m_tag.begin() + colon_pos + 1, m_tag.end()))
@@ -70,24 +70,24 @@ namespace RAOE::Resource
 
     std::string_view Tag::prefix() const    
     {   
-        if(m_tag.find(":") == std::string::npos)
+        if(m_tag.find(':') == std::string::npos)
         {
             return ""sv;
         }
 
         std::string_view tag_as_sv = *this;
-        return tag_as_sv.substr(0, tag_as_sv.find_first_of(":"));    
+        return tag_as_sv.substr(0, tag_as_sv.find_first_of(':'));    
     }
 
     std::string_view Tag::identifier() const    
     {   
-        if(m_tag.find(":") == std::string::npos)
+        if(m_tag.find(':') == std::string::npos)
         {
             return ""sv;
         }
 
         std::string_view tag_as_sv = *this;
-        return tag_as_sv.substr(tag_as_sv.find_first_of(":") + 1); 
+        return tag_as_sv.substr(tag_as_sv.find_first_of(':') + 1); 
     }
 
 }

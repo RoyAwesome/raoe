@@ -23,6 +23,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <string>
 #include <string_view>
 
+namespace RAOE::Resource
+{
+    class Tag;
+}
+
 namespace RAOE::Resource::Asset
 {  
     namespace Tags

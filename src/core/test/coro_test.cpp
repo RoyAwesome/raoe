@@ -14,17 +14,11 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+//TODO: Rework coroutines to be better. Right now this api is not great and doesn't compile on clang
+
 #include <gtest/gtest.h>
 
 #include "coro/coro.hpp"
-
-TEST(CoroTest, InitialTest)
-{
-    raoe::coro::promise<int> p;
-
-    raoe::coro::task<void> task_v;
-    raoe::coro::task<int> task_t;
-}
 
 TEST(CoroTest, Counter)
 {

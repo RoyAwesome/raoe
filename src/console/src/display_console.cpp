@@ -46,7 +46,7 @@ namespace RAOE::Console
         //Remove the ring buffer sink
     }
 
-    void DisplayConsole::Draw(std::string title, bool* p_open)
+    void DisplayConsole::Draw(const std::string& title, bool* p_open)
     {
         ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
         if(!ImGui::Begin(title.c_str(), p_open, ImGuiWindowFlags_NoBringToFrontOnFocus))
@@ -165,7 +165,7 @@ namespace RAOE::Console
 
         if(show_input_tip)
         {            
-            const bool show_hint = history.size() > 0 || !input_buffer.empty();
+            const bool show_hint = history.size() > 0 || !input_buffer.empty(); //NOLINT TODO: Implement this
 
             std::vector<std::string> matching_possible_commands;
             //If the input buffer isn't empty, lets try fuzzy matching the input text to all of the possible commands

@@ -32,7 +32,7 @@ namespace RAOE::Resource
 
     struct DefaultLocator
     {
-        std::filesystem::path operator()(Service& service, Tag tag)
+        std::filesystem::path operator()(Service& service, const Tag& tag)
         {
             using namespace std::literals::string_view_literals;
             std::string_view cog_folder = tag.prefix();

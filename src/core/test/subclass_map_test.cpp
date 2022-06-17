@@ -61,8 +61,8 @@ TEST(SubclassMapTest, BasicUsage)
     animal_map.insert<cow>();
     animal_map.insert<human>();
 
-    EXPECT_EQ(animal_map.find<cat>()->speak(), "meow"sv);
-    EXPECT_EQ(animal_map.find<rex>(), nullptr);
+    EXPECT_EQ(animal_map.find<cat>().lock()->speak(), "meow"sv);
+    EXPECT_FALSE(animal_map.find<rex>().lock());
     EXPECT_EQ(animal_map.size(), 4); //ensure that trying to find a type that is not in the map didn't increase the size of the map
 }
 
@@ -100,5 +100,5 @@ TEST(SubclassMapTest, Find)
     animal_map.insert<cow>();
     animal_map.insert<human>();
 
-    EXPECT_EQ(animal_map.find(typeid(cat))->speak(), "meow"sv);
+    EXPECT_EQ(animal_map.find(typeid(cat)).lock()->speak(), "meow"sv);
 }

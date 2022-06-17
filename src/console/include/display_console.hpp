@@ -33,7 +33,7 @@ namespace RAOE::Console
         DisplayConsole(RAOE::Engine&);
         ~DisplayConsole();
 
-        void Draw(std::string title, bool* p_open);
+        void Draw(const std::string& title, bool* p_open);
 
         void ExecCommand(const std::string& command_line);
 

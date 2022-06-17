@@ -21,7 +21,7 @@ enable_testing()
 
 add_executable(${PROJECT_NAME}
     "parse_test.cpp"
-    "coro_test.cpp"
+#    "coro_test.cpp"
     "command_func_test.cpp"
     "string_test.cpp"
     "subclass_map_test.cpp"

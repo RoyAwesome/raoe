@@ -112,8 +112,8 @@ namespace RAOE
         }
     );
 
-    void foo(int32 a, int32 b, std::string c) {
-            spdlog::info("fooo {} {} {}", a, b, c);
+    void foo(int32 a, int32 b, std::string c) { //NOLINT
+             spdlog::info("fooo {} {} {}", a, b, c);
         }
 
     static AutoRegisterConsoleCommand test_comamnd = RAOE::Console::CreateConsoleCommand(

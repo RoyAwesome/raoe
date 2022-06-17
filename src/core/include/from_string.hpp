@@ -19,6 +19,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include <concepts>
 #include <string_view>
+#include <charconv>
 #include "typeinfo/typename.hpp"
 
 namespace raoe::string
