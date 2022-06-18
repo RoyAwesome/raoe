@@ -53,7 +53,10 @@ namespace RAOE::Cogs
     public:
         BaseCog() = delete; //Cogs must be constructed by the CogService
         BaseCog(const BaseCog&) = delete; //Cogs cannot be copied
-        BaseCog(BaseCog&&) = delete; //Cogs cannot be moved
+        BaseCog& operator=(const BaseCog&) = delete;
+
+        BaseCog(BaseCog&&) = delete; //Cogs cannot be moved        
+        BaseCog& operator=(BaseCog&&) = delete;
         virtual ~BaseCog() = default;
     protected:
         explicit BaseCog(RAOE::Engine& in_engine, std::string_view in_name)
@@ -64,18 +67,18 @@ namespace RAOE::Cogs
         }     
        
     public:
-        RAOE::Engine& engine() { return m_engine; }
-        ECogStatus status() { return m_status; }
-        std::string_view name() { return m_tag.prefix(); }
+        [[nodiscard]] RAOE::Engine& engine() const { return m_engine; }
+        [[nodiscard]] ECogStatus status() const { return m_status; }
+        [[nodiscard]] std::string_view name() const { return m_tag.prefix(); }
         virtual void register_gears() = 0;   
 
         virtual bool is_engine_cog() { return false; }
 
         //BEGIN: IResource Interface
-        virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
+        [[nodiscard]] RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
         //END: IResource Interface
         
-        const RAOE::Resource::Tag& tag() const { return m_tag; }
+        [[nodiscard]] const RAOE::Resource::Tag& tag() const { return m_tag; }
     protected:
 
 
