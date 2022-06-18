@@ -34,14 +34,17 @@ namespace RAOE
     class Engine
     {     
     public:     
-       Engine(const Engine&) = delete;
+        //Engine cannot be copied or moved
+        Engine(const Engine&) = delete;
+        Engine& operator=(const Engine&) = delete;
         Engine(Engine&&) = delete;
+        Engine& operator=(Engine&&) = delete;
 
         ~Engine();
     protected:
         Engine(int argv, char** argc);
         struct FromTest {};
-        Engine(FromTest) : Engine() { }
+        Engine(FromTest) : Engine() { } //NOLINT this is a tag constructor.
 
         //Main calls Init and Run (but nobody else can).  So it's friend.  
         friend int ::main(int, char**);
