@@ -46,7 +46,7 @@ namespace RAOE
         {
             
         }
-        virtual bool is_engine_cog() override { return true; }
+        [[nodiscard]] bool is_engine_cog() const override { return true; }
     };
 
 

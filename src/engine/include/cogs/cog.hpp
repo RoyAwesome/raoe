@@ -72,7 +72,7 @@ namespace RAOE::Cogs
         [[nodiscard]] std::string_view name() const { return m_tag.prefix(); }
         virtual void register_gears() = 0;   
 
-        virtual bool is_engine_cog() { return false; }
+        [[nodiscard]] virtual bool is_engine_cog() const { return false; }
 
         //BEGIN: IResource Interface
         [[nodiscard]] RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
