@@ -23,12 +23,18 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Resource
 {
-    template<is_resource T>
     class ILoader : public IResource
     {
     public:
-        virtual ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }
-        virtual std::shared_ptr<T> load_resource(const std::istream& data_stream) = 0;
+        [[nodiscard]] ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }
+
+        template<is_resource T>
+        std::shared_ptr<T> load_resource(const std::istream& data_stream) 
+        {
+            return std::dynamic_pointer_cast<T>(load_resource_internal(data_stream));
+        }
+    protected:
+        virtual std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) = 0;
     private:
         //File extensions for this loader
         std::vector<std::string> m_extensions;

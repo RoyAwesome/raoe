@@ -42,7 +42,7 @@ namespace RAOE
 
         }
 
-        virtual void register_gears() override
+        void register_gears() override
         {
             
         }
@@ -53,7 +53,7 @@ namespace RAOE
 
     namespace TransitionFunc
     {
-        void no_op(RAOE::Cogs::BaseCog&) { };
+        void no_op(RAOE::Cogs::BaseCog&) { }; //NOLINT - noop
         void register_gears(RAOE::Cogs::BaseCog& cog) 
         { 
             cog.register_gears();
@@ -87,13 +87,13 @@ namespace RAOE
             }
         };
 
-        void LockCogForShutdown(RAOE::Cogs::BaseCog&) 
+        void LockCogForShutdown(RAOE::Cogs::BaseCog&) //NOLINT noop
         { 
         };
     }
 
     using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
-    static AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
+    static const AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
         "quit",
         "Exits the game",
         +[](Engine& engine) {
@@ -104,7 +104,7 @@ namespace RAOE
         }
     );
 
-    static AutoRegisterConsoleCommand log_command = RAOE::Console::CreateConsoleCommand(
+    static const AutoRegisterConsoleCommand log_command = RAOE::Console::CreateConsoleCommand(
         "log",
         "prints the arguments to the log",
         +[](std::string_view args) {
@@ -116,7 +116,7 @@ namespace RAOE
              spdlog::info("fooo {} {} {}", a, b, c);
         }
 
-    static AutoRegisterConsoleCommand test_comamnd = RAOE::Console::CreateConsoleCommand(
+    static const AutoRegisterConsoleCommand test_comamnd = RAOE::Console::CreateConsoleCommand(
         "test_args",
         "prints the arguments to the log",
         foo
@@ -174,7 +174,7 @@ namespace RAOE
         }     
 
         spdlog::info("Registered Commands: ");
-        for(auto& cmd : Console::CommandRegistry::Get().elements())
+        for(const auto& cmd : Console::CommandRegistry::Get().elements())
         {
             spdlog::info("\t{} - {}", cmd->name(), cmd->description());
         }

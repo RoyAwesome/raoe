@@ -53,11 +53,12 @@ namespace RAOE::Resource
 
 
         std::weak_ptr<Handle> create_resource_type(const Tag& tag);
+        
     private:
         std::shared_ptr<Handle> find_or_create_handle(const Tag& tag);
         void pin_resource(Handle* handle);
         void on_handle_destroyed(Handle* destroying_handle);
-        void manage_resource(Tag tag, std::shared_ptr<IResource> resource, Tag resource_type);
+        void manage_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type);
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> m_handle_map;
         std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;

@@ -42,6 +42,11 @@ namespace RAOE::Resource
     
     }
 
+    std::weak_ptr<Handle> Handle::get_resource_type_handle() const
+    {
+        service()->get_resource_weak(resource_type());
+    }
+
     Handle::~Handle()    
     {   
         service()->on_handle_destroyed(this);

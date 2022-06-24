@@ -56,7 +56,7 @@ namespace RAOE::Service
             return gear;
         }
 
-        const raoe::container::subclass_map<RAOE::Cogs::Gear>& all_gears() const { return m_gears; }
+        [[nodiscard]] const raoe::container::subclass_map<RAOE::Cogs::Gear>& all_gears() const { return m_gears; }
     private:
         void internal_register_gear(const std::shared_ptr<RAOE::Cogs::Gear>& in_gear);
 

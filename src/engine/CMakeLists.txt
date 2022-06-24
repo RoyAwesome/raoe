@@ -15,6 +15,7 @@ add_library(${PROJECT_NAME}
     "src/resource/tag.cpp"
     "src/resource/service.cpp"
     "src/resource/handle.cpp"
+    "src/resource/type.cpp"
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

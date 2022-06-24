@@ -33,6 +33,7 @@ namespace RAOE::Resource::Asset
     namespace Tags
     {
         extern const Tag TextLoader;
+        extern const Tag TextAsset;
     }
     class TextAsset : public IResource
     {
@@ -41,19 +42,19 @@ namespace RAOE::Resource::Asset
             : m_contents(in_string)
         {}
 
-        virtual ELoadStatus loadstatus() const { return ELoadStatus::Loaded; }    
+        [[nodiscard]] ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }   
 
-        std::string_view contents() { return m_contents; }
+        [[nodiscard]] std::string_view contents() const { return m_contents; }
 
     private:
         std::string m_contents;
     };
 
-    class TextAssetLoader : public ILoader<TextAsset>
+    class TextAssetLoader : public ILoader
     {
-    public:
-        
-        virtual std::shared_ptr<TextAsset> load_resource(const std::istream& data_stream) override
+
+    protected:        
+        std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) override
         {
             std::stringstream buffer;
             buffer << data_stream.rdbuf();

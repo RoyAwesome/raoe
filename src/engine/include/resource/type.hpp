@@ -22,6 +22,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 namespace RAOE::Resource
 {
+    class ILoader;
+
     class Type : public IResource
     {
     public:
@@ -32,7 +34,7 @@ namespace RAOE::Resource
         Type() = delete;
         Type(const Type&) = default;
         Type(Type&&) = default;
-        virtual ~Type() = default;
+        ~Type() override = default;
 
         Type& operator=(const Type&) = default;
         Type& operator=(Type&&) = default;
@@ -43,7 +45,11 @@ namespace RAOE::Resource
         //BEGIN: IResource Interface
         [[nodiscard]] RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
         //END: IResource Interface
+
+        void add_loader(const std::weak_ptr<ILoader>& loader);
+        void remove_loader(const std::weak_ptr<ILoader>& loader);
     private:
         Tag m_type_tag;
+        std::vector<std::weak_ptr<ILoader>> m_loaders;
     };
 }

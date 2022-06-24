@@ -121,6 +121,7 @@
     },
     "clang-tidy.checks": [
         "cppcoreguidelines-*",
+        "-cppcoreguidelines-avoid-magic-numbers",
         "clang-analyzer-*",
         "modernize-*",
         "-modernize-use-trailing-return-type",

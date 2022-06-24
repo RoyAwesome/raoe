@@ -99,7 +99,7 @@ TEST(Loader, ResourceResolverTest)
 
     std::ifstream file(resolved_path.string());
 
-    std::shared_ptr<RAOE::Resource::Asset::TextAsset> resource = loader.load_resource(file);
+    std::shared_ptr<RAOE::Resource::Asset::TextAsset> resource = loader.load_resource<RAOE::Resource::Asset::TextAsset>(file);
 
     file.close();
 

@@ -44,6 +44,7 @@ namespace RAOE::Resource
 
         [[nodiscard]] const Tag& tag() const { return m_tag; }
         [[nodiscard]] const Tag& resource_type() const { return m_resource_type; }
+        [[nodiscard]] std::weak_ptr<Handle> get_resource_type_handle() const;
         [[nodiscard]] RAOE::Engine& engine() const;
         [[nodiscard]] Service* service() const { return &m_service; }
         [[nodiscard]] bool loaded() const;
@@ -51,7 +52,7 @@ namespace RAOE::Resource
         [[nodiscard]] std::weak_ptr<IResource> get() const { return m_resource; }
 
         template<std::derived_from<IResource> T>
-        [[nodiscard]] std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get()); }
+        [[nodiscard]] std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get().lock()); }
 
         void pin();
 

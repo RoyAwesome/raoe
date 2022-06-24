@@ -56,6 +56,19 @@ namespace RAOE::Resource
     public:
         void operator()(std::shared_ptr<Handle> handle, std::output_iterator<ResolvedResource> auto out_itr)
         {
+            if(!handle)
+            {
+                spdlog::error("Unable to load resource, handle is invalid");
+                return;
+            }
+            if(handle->resource_type() == TypeTags::Unknown)
+            {
+                spdlog::error("Unable to resolve resource for {}, type is {}", handle->tag(), handle->resource_type());
+                return;
+            }
+
+            RAOE::Resource::Type resource_type = handle->get_resource_type_handle()
+
             L locator_func {};
             std::filesystem::path unresolved_path = locator_func(*handle->service(), handle->tag());
 

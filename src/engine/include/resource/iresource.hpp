@@ -31,14 +31,18 @@ namespace RAOE::Resource
             Loading,
             Loaded,
         };
+        IResource() = default;
+        virtual ~IResource() = default;
 
-        virtual ELoadStatus loadstatus() const = 0;
+        IResource(const IResource&) = default;
+        IResource& operator=(const IResource&) = default;
+        IResource(IResource&&) = default;
+        IResource& operator=(IResource&&) = default;
+
+        [[nodiscard]] virtual ELoadStatus loadstatus() const = 0;
     private:
     };
 
     template<typename T>
     concept is_resource = std::derived_from<T, IResource>;
-
-    //template t resource loader
-    //
 }
