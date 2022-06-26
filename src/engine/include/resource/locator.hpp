@@ -67,7 +67,7 @@ namespace RAOE::Resource
                 return;
             }
 
-            RAOE::Resource::Type resource_type = handle->get_resource_type_handle()
+            Type& resource_type = handle->get_resource_type_handle()
 
             L locator_func {};
             std::filesystem::path unresolved_path = locator_func(*handle->service(), handle->tag());

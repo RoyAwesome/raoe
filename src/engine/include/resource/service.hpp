@@ -27,6 +27,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 namespace RAOE::Resource
 {
     class Handle;
+    class Type;
 
     namespace TypeTags
     {   
@@ -44,16 +45,18 @@ namespace RAOE::Resource
         friend void print_handle_information(Engine&);
         Service(RAOE::Engine& in_engine);
 
-        std::shared_ptr<Handle> get_resource(const Tag& tag);
-        std::weak_ptr<Handle> get_resource_weak(const Tag& tag);
+        [[nodiscard]] std::shared_ptr<Handle> get_resource(const Tag& tag);
+        [[nodiscard]] std::weak_ptr<Handle> get_resource_weak(const Tag& tag) const;
 
         std::shared_ptr<Handle> load_resource(const Tag& tag);
-        std::shared_ptr<Handle> emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource, Tag resource_type);
-        std::shared_ptr<Handle> emplaced_owned_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type);
+        std::shared_ptr<Handle> emplace_resource(const Tag& tag, const std::weak_ptr<IResource>& resource, const Tag& resource_type);
+        std::shared_ptr<Handle> emplaced_owned_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type)  ;
 
 
         std::weak_ptr<Handle> create_resource_type(const Tag& tag);
         
+
+        [[nodiscard]] const Type& unknown_type() const;
     private:
         std::shared_ptr<Handle> find_or_create_handle(const Tag& tag);
         void pin_resource(Handle* handle);

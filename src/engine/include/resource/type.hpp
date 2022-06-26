@@ -48,6 +48,8 @@ namespace RAOE::Resource
 
         void add_loader(const std::weak_ptr<ILoader>& loader);
         void remove_loader(const std::weak_ptr<ILoader>& loader);
+
+        [[nodiscard]] const std::vector<std::weak_ptr<ILoader>>& loaders() const { return m_loaders; }
     private:
         Tag m_type_tag;
         std::vector<std::weak_ptr<ILoader>> m_loaders;

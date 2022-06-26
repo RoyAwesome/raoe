@@ -28,6 +28,7 @@ namespace RAOE
 namespace RAOE::Resource
 {
     class Service;
+    class Type;
 
     class Handle
     {
@@ -45,6 +46,7 @@ namespace RAOE::Resource
         [[nodiscard]] const Tag& tag() const { return m_tag; }
         [[nodiscard]] const Tag& resource_type() const { return m_resource_type; }
         [[nodiscard]] std::weak_ptr<Handle> get_resource_type_handle() const;
+        [[nodiscard]] const Type& get_resource_type() const;
         [[nodiscard]] RAOE::Engine& engine() const;
         [[nodiscard]] Service* service() const { return &m_service; }
         [[nodiscard]] bool loaded() const;

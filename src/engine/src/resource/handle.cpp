@@ -19,6 +19,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "resource/iresource.hpp"
 #include "resource/service.hpp"
 #include "engine.hpp"
+#include "resource/type.hpp"
 
 namespace RAOE::Resource
 {
@@ -44,7 +45,20 @@ namespace RAOE::Resource
 
     std::weak_ptr<Handle> Handle::get_resource_type_handle() const
     {
-        service()->get_resource_weak(resource_type());
+        return service()->get_resource_weak(resource_type());
+    }
+
+    const Type& Handle::get_resource_type() const    
+    {
+        if(auto locked_handle = get_resource_type_handle().lock())
+        {
+            if(locked_handle->loaded())
+            {
+                return *locked_handle->get<Type>().lock();
+            }
+        }
+
+        return service()->unknown_type();
     }
 
     Handle::~Handle()    

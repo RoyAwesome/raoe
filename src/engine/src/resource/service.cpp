@@ -68,7 +68,7 @@ namespace RAOE::Resource
         return find_or_create_handle(tag);
     }
 
-    std::weak_ptr<Handle> Service::get_resource_weak(const Tag& tag)    
+    std::weak_ptr<Handle> Service::get_resource_weak(const Tag& tag) const    
     {
         auto found_handle = m_handle_map.find(tag);
         return found_handle != m_handle_map.find(tag) ? found_handle->second : std::weak_ptr<Handle>();
@@ -84,7 +84,7 @@ namespace RAOE::Resource
         return handle;
     }
 
-    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, std::weak_ptr<IResource> resource, Tag resource_type)    
+    std::shared_ptr<Handle> Service::emplace_resource(const Tag& tag, const std::weak_ptr<IResource>& resource, const Tag& resource_type)    
     {
         auto handle = find_or_create_handle(tag);  
         if(m_owned_resources.contains(resource_type))
@@ -103,7 +103,7 @@ namespace RAOE::Resource
         return handle;
     }
 
-    std::shared_ptr<Handle> Service::emplaced_owned_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type)    
+    std::shared_ptr<Handle> Service::emplaced_owned_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type)    
     {  
         m_owned_resources.insert_or_assign(tag, resource);
         return emplace_resource(tag, resource, resource_type);    
@@ -119,6 +119,17 @@ namespace RAOE::Resource
         handle->pin();  
 
         return handle;
+    }
+
+    const Type& Service::unknown_type() const    
+    {   
+        if(auto resource = get_resource_weak(TypeTags::Unknown).lock())
+        {
+            return *resource->get<Type>().lock();
+        }
+       
+        std::terminate();//crash
+    
     }
 
     std::shared_ptr<Handle> Service::find_or_create_handle(const Tag& tag)    
@@ -140,7 +151,7 @@ namespace RAOE::Resource
    
     void Service::pin_resource(Handle* handle)    
     {   
-        if(handle)
+        if(handle != nullptr)
         {
             auto found_handle = m_handle_map.find(handle->tag());
             if(found_handle != m_handle_map.end())
@@ -189,7 +200,7 @@ namespace RAOE::Resource
         }  
     }
     using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
-    static AutoRegisterConsoleCommand print_handle_info_command = RAOE::Console::CreateConsoleCommand(
+    static const AutoRegisterConsoleCommand print_handle_info_command = RAOE::Console::CreateConsoleCommand(
         "print_resource_info",
         "Prints resources to the console, in the format [Tag] - [LoadStatus]",
         print_handle_information
