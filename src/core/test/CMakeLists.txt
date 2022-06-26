@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
     "command_func_test.cpp"
     "string_test.cpp"
     "subclass_map_test.cpp"
+    "lazy_test.cpp"
 )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
