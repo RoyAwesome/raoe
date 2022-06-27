@@ -46,20 +46,15 @@ namespace RAOE::Resource
         : IService(in_engine)
     {
         //Create the basic types that are always available to the resource system
-        create_resource_type(TypeTags::Type);
-        create_resource_type(TypeTags::Unknown);
-        create_resource_type(TypeTags::Cog);
-        create_resource_type(TypeTags::Gear);
-        create_resource_type(TypeTags::Loader);
+        init_resource_type(TypeTags::Type);
+        init_resource_type(TypeTags::Unknown);
+        init_resource_type(TypeTags::Cog);
+        init_resource_type(TypeTags::Gear);
+        init_resource_type(TypeTags::Loader);
 
         //emplace the basic loaders that are always available
-        std::shared_ptr<Handle> loader = emplaced_owned_resource(Asset::Tags::TextLoader, std::static_pointer_cast<IResource>(std::make_shared<Asset::TextAssetLoader>()), TypeTags::Loader);
-        loader->pin();
-        
-        if(auto text_asset = create_resource_type(Asset::Tags::TextAsset).lock())
-        {
-            text_asset->get<Type>().lock()->add_loader(loader->get<ILoader>());
-        }
+        init_resource_type(Asset::Tags::TextAsset);
+        create_loader_for_type<Asset::TextAssetLoader>(Asset::Tags::TextAsset);       
 
     }
 
@@ -109,15 +104,18 @@ namespace RAOE::Resource
         return emplace_resource(tag, resource, resource_type);    
     }
 
-    std::weak_ptr<Handle> Service::create_resource_type(const Tag& tag)    
+    std::weak_ptr<Handle> Service::init_resource_type(const Tag& tag)    
     {  
         auto handle = find_or_create_handle(tag);
-        std::shared_ptr<IResource> resource = std::make_shared<Type>(tag);
-        m_owned_resources.insert_or_assign(tag, resource);
-        handle->m_resource_type = TypeTags::Type;
-        handle->m_resource = resource;
-        handle->pin();  
-
+        if(!handle->get<Type>().lock())
+        {
+            std::shared_ptr<IResource> resource = std::make_shared<Type>(tag);
+            m_owned_resources.insert_or_assign(tag, resource);
+            handle->m_resource_type = TypeTags::Type;
+            handle->m_resource = resource;
+            handle->pin();  
+        }
+       
         return handle;
     }
 
@@ -172,7 +170,7 @@ namespace RAOE::Resource
     
     }
 
-    void Service::manage_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type)  
+    void Service::manage_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type)  
     {   
         auto handle = find_or_create_handle(tag);
         m_owned_resources.insert_or_assign(tag, resource);

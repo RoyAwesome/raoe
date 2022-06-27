@@ -43,14 +43,23 @@ namespace RAOE::Resource
     
     }
 
-    std::weak_ptr<Handle> Handle::get_resource_type_handle() const
+    std::shared_ptr<Handle> Handle::type_handle() const
     {
-        return service()->get_resource_weak(resource_type());
+        return service()->get_resource(resource_type());
     }
 
-    const Type& Handle::get_resource_type() const    
+    std::shared_ptr<Type> Handle::type() const    
     {
-        if(auto locked_handle = get_resource_type_handle().lock())
+        if(auto locked_handle = type_handle(); locked_handle->loaded())
+        {
+            return locked_handle->get<Type>().lock();
+        }
+        return {};    
+    }
+
+    const Type& Handle::type_ref() const    
+    {
+        if(auto locked_handle = type_handle())
         {
             if(locked_handle->loaded())
             {

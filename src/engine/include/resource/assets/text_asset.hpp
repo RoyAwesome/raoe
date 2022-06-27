@@ -52,7 +52,10 @@ namespace RAOE::Resource::Asset
 
     class TextAssetLoader : public ILoader
     {
-
+    public:
+        TextAssetLoader()
+            : ILoader(Tags::TextLoader)
+        {}
     protected:        
         std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) override
         {

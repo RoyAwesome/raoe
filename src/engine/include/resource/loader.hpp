@@ -17,6 +17,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #pragma once
 
 #include "resource/iresource.hpp"
+#include "resource/tag.hpp"
 #include <vector>
 #include <string>
 #include <memory>
@@ -26,6 +27,11 @@ namespace RAOE::Resource
     class ILoader : public IResource
     {
     public:
+        ILoader(Tag in_tag)
+            : m_tag(std::move(in_tag))
+        {
+        }
+
         [[nodiscard]] ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }
 
         template<is_resource T>
@@ -33,10 +39,13 @@ namespace RAOE::Resource
         {
             return std::dynamic_pointer_cast<T>(load_resource_internal(data_stream));
         }
+
+        [[nodiscard]] const Tag& tag() const { return m_tag; }
     protected:
         virtual std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) = 0;
     private:
         //File extensions for this loader
         std::vector<std::string> m_extensions;
+        Tag m_tag;
     };
 }

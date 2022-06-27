@@ -18,6 +18,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include <gmock/gmock.h>
 
 #include "resource/locator.hpp"
+#include "resource/handle.hpp"
+#include "resource/tag.hpp"
+#include "resource/type.hpp"
 #include "engine.hpp"
 
 #include "resource/assets/text_asset.hpp"
@@ -46,7 +49,7 @@ TEST(Locator, GenericTest)
     if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
     {        
         RAOE::Resource::DefaultLocator default_locator;
-        std::filesystem::path p = default_locator(*(resource_service.get()), RAOE::Resource::Tag("raoe:testfile"));
+        std::filesystem::path p = default_locator(*(resource_service), RAOE::Resource::Tag("raoe:testfile"));
         spdlog::info("{}", p.string());
     }
     
@@ -106,4 +109,19 @@ TEST(Loader, ResourceResolverTest)
     spdlog::info(resource->contents());
 
     EXPECT_EQ(resource->contents(), "hello world"sv);
+}
+
+TEST(Loader, TypeHasLoaders)
+{
+    using Engine = ResourceLocatorTest::Engine;
+    Engine e;
+    if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
+    {
+        std::shared_ptr<RAOE::Resource::Handle> resource_handle = resource_service->get_resource(RAOE::Resource::Asset::Tags::TextAsset); 
+        EXPECT_TRUE(resource_handle);
+        const auto& type = resource_handle->get_ref<RAOE::Resource::Type>();
+        EXPECT_EQ(type.tag(), RAOE::Resource::Asset::Tags::TextAsset);
+        EXPECT_EQ(type.loaders().size(), 1);
+        EXPECT_EQ(type.loaders().at(0).lock()->tag(), RAOE::Resource::Asset::Tags::TextLoader);
+    }
 }

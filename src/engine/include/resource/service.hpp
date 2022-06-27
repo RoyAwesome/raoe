@@ -20,6 +20,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "services/iservice.hpp"
 #include "resource/tag.hpp"
 #include "resource/iresource.hpp"
+#include "resource/loader.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -52,16 +53,32 @@ namespace RAOE::Resource
         std::shared_ptr<Handle> emplace_resource(const Tag& tag, const std::weak_ptr<IResource>& resource, const Tag& resource_type);
         std::shared_ptr<Handle> emplaced_owned_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type)  ;
 
-
-        std::weak_ptr<Handle> create_resource_type(const Tag& tag);
+        //inits a resource, or returns it if the resource exists
+        std::weak_ptr<Handle> init_resource_type(const Tag& tag);
         
 
         [[nodiscard]] const Type& unknown_type() const;
+
+        template<typename T>
+            requires std::derived_from<T, ILoader> && std::is_default_constructible_v<T>
+        std::weak_ptr<ILoader> create_loader_for_type(const Tag& type_tag)
+        {
+            std::shared_ptr<T> loader_asset = std::make_shared<T>();
+            std::shared_ptr<Handle> loader_handle = emplaced_owned_resource(loader_asset->tag(), std::static_pointer_cast<IResource>(loader_asset), TypeTags::Loader);
+            loader_handle->pin();
+
+            if(auto type_asset_handle = init_resource_type(type_tag).lock())
+            {               
+                type_asset_handle->get<RAOE::Resource::Type>().lock()->add_loader(loader_asset);
+            }
+
+            return std::static_pointer_cast<ILoader>(loader_asset);
+        }
     private:
         std::shared_ptr<Handle> find_or_create_handle(const Tag& tag);
         void pin_resource(Handle* handle);
         void on_handle_destroyed(Handle* destroying_handle);
-        void manage_resource(const Tag& tag, std::shared_ptr<IResource> resource, const Tag& resource_type);
+        void manage_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type);
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> m_handle_map;
         std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;

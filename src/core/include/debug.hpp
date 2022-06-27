@@ -25,7 +25,7 @@ namespace raoe::debug
 
 inline namespace _
 {
-    
+//NOLINTBEGIN 
     /* Debugging assertions and traps
  * Portable Snippets - https://github.com/nemequ/portable-snippets
  * Created by Evan Nemerson <evan@nemerson.com>
@@ -116,18 +116,18 @@ static inline void psnip_trap(void) { __asm__ __volatile__("NOP\n .word 0x100000
         psnip_trap();
     }
 
-    RAOE_FORCEINLINE void debug_break_if(bool condition)
+    RAOE_FORCEINLINE bool debug_break_if(bool condition)
     {
         psnip_dbg_assert(condition);
+        return !condition;
     }
-
 #ifdef psnip_trap
 #undef psnip_trap
 #endif
 
 #undef PSNIP_DEBUG_TRAP_H
 
-   
+//NOLINTEND
 
 
 }
