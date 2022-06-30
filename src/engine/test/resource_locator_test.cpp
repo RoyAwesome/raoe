@@ -125,3 +125,4 @@ TEST(Loader, TypeHasLoaders)
         EXPECT_EQ(type.loaders().at(0).lock()->tag(), RAOE::Resource::Asset::Tags::TextLoader);
     }
 }
+

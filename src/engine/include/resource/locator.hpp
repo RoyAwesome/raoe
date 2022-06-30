@@ -87,9 +87,26 @@ namespace RAOE::Resource
                 auto extension = file.path().extension();
 
                 //Find the file type that matches this extension
-
-                //build and return the resolved info
-                *(++out_itr) = ResolvedResource { file.path(), TypeTags::Unknown };
+                for(const auto& [tag, weak_type_handle] : handle->service()->handle_map())
+                {
+                    if(auto type_handle = weak_type_handle.lock())
+                    {
+                        if(type_handle->resource_type() == RAOE::Resource::TypeTags::Type)
+                        {
+                            for(const auto& weak_loader : type_handle->get_ref<RAOE::Resource::Type>().loaders())
+                            {
+                                if(std::shared_ptr<RAOE::Resource::ILoader> loader = weak_loader.lock())
+                                {
+                                    if(loader->loads_extension(extension.string()))
+                                    {
+                                        //build and return the resolved info
+                                        *(++out_itr) = ResolvedResource { file.path(), type_handle->tag() };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     };

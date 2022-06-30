@@ -41,11 +41,23 @@ namespace RAOE::Resource
         }
 
         [[nodiscard]] const Tag& tag() const { return m_tag; }
+        [[nodiscard]] bool loads_extension(std::string_view extension) const
+        {
+            for(const std::string& ext : m_extensions)
+            {
+                if(ext == extension) 
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     protected:
         virtual std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) = 0;
-    private:
         //File extensions for this loader
         std::vector<std::string> m_extensions;
+    private:
         Tag m_tag;
     };
 }

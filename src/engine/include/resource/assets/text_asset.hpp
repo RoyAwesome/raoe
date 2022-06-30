@@ -55,7 +55,9 @@ namespace RAOE::Resource::Asset
     public:
         TextAssetLoader()
             : ILoader(Tags::TextLoader)
-        {}
+        {
+            m_extensions = {".txt"};
+        }
     protected:        
         std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) override
         {

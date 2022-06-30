@@ -74,6 +74,9 @@ namespace RAOE::Resource
 
             return std::static_pointer_cast<ILoader>(loader_asset);
         }
+
+        [[nodiscard]] const std::unordered_map<Tag, std::weak_ptr<Handle>>& handle_map() const { return m_handle_map; }
+    
     private:
         std::shared_ptr<Handle> find_or_create_handle(const Tag& tag);
         void pin_resource(Handle* handle);

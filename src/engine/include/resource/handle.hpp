@@ -58,6 +58,9 @@ namespace RAOE::Resource
         [[nodiscard]] std::weak_ptr<T> get() const { return std::dynamic_pointer_cast<T>(get().lock()); }
 
         template<std::derived_from<IResource> T>
+        [[nodiscard]] bool is() const { return get<T>().expired(); }
+
+        template<std::derived_from<IResource> T>
         [[nodiscard]] const T& get_ref() const 
         {
             if(auto ptr = get<T>().lock())
