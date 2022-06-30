@@ -30,7 +30,7 @@ namespace RAOE::Resource
     class Service;
     class Type;
 
-    class Handle
+    class Handle : public std::enable_shared_from_this<Handle>
     {
     public:
         friend class Service;

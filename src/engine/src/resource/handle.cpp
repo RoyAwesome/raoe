@@ -20,6 +20,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "resource/service.hpp"
 #include "engine.hpp"
 #include "resource/type.hpp"
+#include "resource/locator.hpp"
+
+#include <fstream>
 
 namespace RAOE::Resource
 {
@@ -39,8 +42,33 @@ namespace RAOE::Resource
 
     void Handle::load_resource_synchronously()    
     {   
-        
+        std::vector<RAOE::Resource::ResolvedResource> resolved_resources;
+        RAOE::Resource::ResourceResolver resolver {};
     
+        resolver(shared_from_this(), std::back_inserter(resolved_resources));
+        if(resolved_resources.empty())
+        {
+            spdlog::error("Attempted to load {} but no file found", tag());
+            return;
+        }
+
+        const RAOE::Resource::ResolvedResource& resolved_resource = resolved_resources[0];
+
+        std::ifstream file(resolved_resource.resolved_path.string());
+        std::shared_ptr<IResource> resource = resolved_resource.loader->load_resource(file);
+        file.close();
+        if(resource)
+        {
+            service()->emplaced_owned_resource(tag(), resource, resolved_resource.filetype);
+            m_resource = resource;
+            m_resource_type = resolved_resource.filetype;
+            spdlog::info("Loaded: {} as a {} from path {}", tag(), resource_type(), resolved_resource.resolved_path.string());
+        }
+        else
+        {
+            spdlog::error("Failed to load {}, loader {} failed to load", tag(), resolved_resource.loader->tag());
+        }
+
     }
 
     std::shared_ptr<Handle> Handle::type_handle() const

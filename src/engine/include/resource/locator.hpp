@@ -48,6 +48,7 @@ namespace RAOE::Resource
     {
         std::filesystem::path resolved_path;
         RAOE::Resource::Tag filetype;
+        std::shared_ptr<ILoader> loader;
     };
 
     template<Locator L = DefaultLocator>
@@ -100,7 +101,7 @@ namespace RAOE::Resource
                                     if(loader->loads_extension(extension.string()))
                                     {
                                         //build and return the resolved info
-                                        *(++out_itr) = ResolvedResource { file.path(), type_handle->tag() };
+                                        *(++out_itr) = ResolvedResource { file.path(), type_handle->tag(), loader };
                                     }
                                 }
                             }

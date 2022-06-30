@@ -167,7 +167,7 @@ namespace RAOE::Resource
 
     void Service::on_handle_destroyed(Handle* destroying_handle)    
     {        
-    
+        //m_owned_resources.erase(destroying_handle->tag());
     }
 
     void Service::manage_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type)  
@@ -177,6 +177,11 @@ namespace RAOE::Resource
         handle->m_resource_type = resource_type;
         handle->m_resource = resource;
         handle->pin();            
+    }
+
+    void Service::post_load_resource(const Tag& tag, const std::shared_ptr<IResource>& resource)    
+    {   
+        m_owned_resources.insert_or_assign(tag, resource);
     }
 
     void print_handle_information(Engine& engine)

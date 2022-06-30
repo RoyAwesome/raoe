@@ -82,6 +82,7 @@ namespace RAOE::Resource
         void pin_resource(Handle* handle);
         void on_handle_destroyed(Handle* destroying_handle);
         void manage_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type);
+        void post_load_resource(const Tag& tag, const std::shared_ptr<IResource>& resource);
 
         std::unordered_map<Tag, std::weak_ptr<Handle>> m_handle_map;
         std::unordered_map<Tag, std::shared_ptr<Handle>> m_pinned_resources;

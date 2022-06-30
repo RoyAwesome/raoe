@@ -126,3 +126,18 @@ TEST(Loader, TypeHasLoaders)
     }
 }
 
+TEST(Loader, LoadAPI)
+{
+    using Engine = ResourceLocatorTest::Engine;
+    Engine e;
+    if(auto resource_service = e.get_service<RAOE::Resource::Service>().lock())
+    {
+        std::shared_ptr test_asset = resource_service->get_resource(RAOE::Resource::Tag("raoe:test/testasset"));
+        test_asset->load_resource_synchronously();
+        EXPECT_TRUE(test_asset->loaded());        
+        EXPECT_EQ(test_asset->resource_type(), RAOE::Resource::Asset::Tags::TextAsset);
+        EXPECT_TRUE(test_asset->get<RAOE::Resource::Asset::TextAsset>().lock());
+        EXPECT_EQ(test_asset->get_ref<RAOE::Resource::Asset::TextAsset>().contents(), "hello world"sv);
+    }
+}
+
