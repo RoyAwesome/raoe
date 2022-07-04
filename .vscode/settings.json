@@ -132,5 +132,8 @@
         "portability-*",
         "bugprone-*",
         "-bugprone-exception-escape"
+    ],
+    "clang-tidy.blacklist": [
+        "build/_deps/"
     ]
 }
