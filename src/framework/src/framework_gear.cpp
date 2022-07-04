@@ -14,28 +14,33 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+#include "framework.hpp"
 #include "cogs/cog.hpp"
-#include "flecs_gear.hpp"
-#include "imgui_module.hpp"
+#include "cogs/gear.hpp"
+#include "resource/resources.hpp"
+
+namespace RAOE::Framework::Tags
+{
+    const RAOE::Resource::Tag GameType = RAOE::Resource::Tag("raoe:type/game");
+}
 
 namespace RAOE::Gears
 {
-    struct ImguiSdlFlecsGear : public RAOE::Cogs::Gear
+    struct FrameworkGear : public RAOE::Cogs::Gear
     {
-        ImguiSdlFlecsGear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)
+        FrameworkGear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)
             : RAOE::Cogs::Gear(in_cog, in_name)
-        {
-
+        {            
         }
 
         void activated() override
         {
-            auto flecs_gear = engine().get_service<RAOE::Service::GearService>().lock()->get_gear<FlecsGear>().lock();
-            if(flecs_gear)
+            if(auto resource_service = engine().get_service<RAOE::Resource::Service>().lock())
             {
-                flecs_gear->ecs_world_client->import<RAOE::ECS::Imgui::Module>();
+                resource_service->init_resource_type(RAOE::Framework::Tags::GameType);
             }
         }
     };
 }
-RAOE_DEFINE_GEAR(ImguiGear, RAOE::Gears::ImguiSdlFlecsGear)
+
+RAOE_DEFINE_GEAR(FrameworkGear, RAOE::Gears::FrameworkGear)

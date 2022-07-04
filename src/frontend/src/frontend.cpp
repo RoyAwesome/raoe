@@ -14,29 +14,21 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
+#include "frontend.hpp"
 #include "engine.hpp"
+#include "resource/resources.hpp"
+#include "flecs.h"
+#include "flecs_gear.hpp"
 
-#include "cogs/cog.hpp"
-
-#ifndef RAOE_STATIC_COGS
-#define RAOE_STATIC_COGS 1 //NOLINT TODO: get cmake to produce this.  this should be default 0
-#endif
-
-#if RAOE_STATIC_COGS
-#include "static_cogs.inl"
-#endif
-
-int main(int argc, char* argv[])
+namespace RAOE::Frontend
 {
-    RAOE::Engine engine(argc, argv);
+    Module::Module(flecs::world& in_world)
+    {
+        
+      
+    }
 
-#if RAOE_STATIC_COGS
-    RAOE::_GENERATED::LoadStaticCogs(engine);
-#endif
-
-    engine.Startup();
-    while(!engine.Run()) {}
-    engine.Shutdown();
-
-    return 0;
 }
+
+
+

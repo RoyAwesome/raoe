@@ -44,7 +44,7 @@ namespace RAOE::Gears
             lvl = spdlog::level::critical;
         }
 
-        std::string indentation = "";
+        std::string indentation;
         for(int32 i  = 0; i < ecs_os_api.log_indent_; i++)
         {
             indentation += "\t -";
@@ -59,7 +59,7 @@ namespace RAOE::Gears
         ecs_os_api_t api = ecs_os_api;
     
         api.log_ = LogECS;
-        api.log_with_color_ = true;
+        api.flags_ |= EcsOsApiLogWithColors;
         ecs_os_set_api(&api);
 
         ecs_log_set_level(0);
