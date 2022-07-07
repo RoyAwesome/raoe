@@ -41,9 +41,7 @@ namespace RAOE::Resource::Asset
         TextAsset(std::string_view in_string)
             : m_contents(in_string)
         {}
-
-ed
-
+        
         [[nodiscard]] std::string_view contents() const { return m_contents; }
 
     private:
