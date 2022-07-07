@@ -42,7 +42,7 @@ namespace RAOE::Resource::Asset
             : m_contents(in_string)
         {}
 
-        [[nodiscard]] ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }   
+ed
 
         [[nodiscard]] std::string_view contents() const { return m_contents; }
 

@@ -19,6 +19,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "flecs_gear.hpp"
 #include "client_app_module.hpp"
 #include "glm/glm.hpp"
+#include "frontend.hpp"
+#include "frontend_internal.hpp"
 
 namespace RAOE::Frontend
 {
@@ -35,7 +37,8 @@ namespace RAOE::Frontend
                 if(auto flecs_gear = gear_service->get_gear<RAOE::Gears::FlecsGear>().lock() )
                 {
                     flecs_gear->ecs_world_client->entity().set<RAOE::ECS::ClientApp::Canvas>({"RAOE", glm::ivec2(1600, 900), glm::i8vec4(0, 0, 0, 0)}); //NOLINT complains about the resolution.
-                    
+                    flecs_gear->ecs_world_client->import<RAOE::Frontend::Module>();
+                    flecs_gear->ecs_world_client->entity().set<RAOE::Frontend::FrontenedPanel>({});
                 }
             }
         }

@@ -30,15 +30,16 @@ namespace RAOE::Gears
     {
         FrameworkGear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)
             : RAOE::Cogs::Gear(in_cog, in_name)
-        {            
+        {   
+            if(auto resource_service = engine().get_service<RAOE::Resource::Service>().lock())
+            {
+                resource_service->init_resource_type(RAOE::Framework::Tags::GameType);
+            }         
         }
 
         void activated() override
         {
-            if(auto resource_service = engine().get_service<RAOE::Resource::Service>().lock())
-            {
-                resource_service->init_resource_type(RAOE::Framework::Tags::GameType);
-            }
+            
         }
     };
 }
