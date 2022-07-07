@@ -44,6 +44,8 @@ namespace RAOE::Resource::Asset
         
         [[nodiscard]] std::string_view contents() const { return m_contents; }
 
+        [[nodiscard]] ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }   
+
     private:
         std::string m_contents;
     };
@@ -56,6 +58,7 @@ namespace RAOE::Resource::Asset
         {
             m_extensions = {".txt"};
         }
+        
     protected:        
         std::shared_ptr<IResource> load_resource_internal(const std::istream& data_stream) override
         {
