@@ -18,7 +18,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "engine.hpp"
 #include "client_app_module.hpp"
 #include "cogs/cog.hpp"
-#include "services/tick_service.hpp"
+#include "services/task_service.hpp"
+#include "lazy.hpp"
 
 namespace RAOE::Gears
 {
@@ -75,22 +76,24 @@ namespace RAOE::Gears
         InitFLECSSystem();    
     }
 
+    raoe::lazy<> tick_ecs(Engine& engine, const std::unique_ptr<flecs::world>& world_ptr)
+    {
+        while(!engine.shutdown_requested())
+        {
+            if(!world_ptr->progress())
+            {
+                engine.request_exit();
+            }      
+            co_await std::suspend_always();      
+        }
+    }
+
     void FlecsGear::activated()    
     {
-        if(auto tick_service = engine().get_service<RAOE::Service::TickService>().lock())
+        if(auto task_service = engine().get_service<RAOE::Service::TaskService>().lock() )
         {
-            tick_service->register_tickfunc([this]()
-            {
-                if(ecs_world_client)
-                {
-                    if(!ecs_world_client->progress())
-                    {
-                        engine().get_service<RAOE::Service::TickService>().lock()->request_exit();
-                    }
-                }
-            });
-        }
-       
+            task_service->add_task(tick_ecs(engine(), ecs_world_client));
+        }       
       
 
         if(ecs_world_client)

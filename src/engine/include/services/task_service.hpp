@@ -18,37 +18,21 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 #include "core_minimal.hpp"
 #include "services/iservice.hpp"
+#include "lazy.hpp"
 
 namespace RAOE::Service
 {
-    class TickService : public IService
+    class TaskService : public IService
     {
-        using Super = IService;
     public:
-        TickService(Engine& in_engine)
-        : IService(in_engine)
+        TaskService(Engine& in_engine)
+            : IService(in_engine)
         {            
         }
 
-        void register_tickfunc(std::function<void()>&& tickfunc)
-        {
-            tick_funcs.emplace_back(std::move(tickfunc));
-        }
-
-        void request_exit() { exit_requested = true; }
-        bool should_exit() const { return exit_requested; }
-
-        friend class RAOE::Engine;
+        void process_tasks();
+        void add_task(raoe::lazy<>&& task);
     private:
-        void run_frame()
-        {
-            for(const auto& tick_func : tick_funcs)
-            {
-                tick_func();
-            }
-        }
-
-        bool exit_requested = false;
-        std::vector<std::function<void()>> tick_funcs;
+        std::list<raoe::lazy<>> m_task_list;
     };
 }

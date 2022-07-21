@@ -19,6 +19,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "cogs/gear.hpp"
 #include "framework.hpp"
 #include "resource/resources.hpp"
+#include "lazy.hpp"
+#include "services/task_service.hpp"
 
 namespace RAOE::Pong
 {
@@ -38,6 +40,17 @@ namespace RAOE::Pong
         }
     };
 
+    raoe::lazy<> init_game(RAOE::Engine& engine)
+    {
+        if(auto resource_service = engine.get_service<RAOE::Resource::Service>().lock())
+        {
+            auto game_handle = resource_service->get_resource(RAOE::Framework::Tags::GameType);        
+            co_await RAOE::Resource::handle_loaded(game_handle);
+
+            resource_service->emplaced_owned_resource(PongGameTag, std::make_shared<Game>(engine), RAOE::Framework::Tags::GameType);
+        }
+    }
+
 
     struct Gear : RAOE::Cogs::Gear
     {
@@ -47,11 +60,10 @@ namespace RAOE::Pong
 
         void activated() override
         {
-            //Create the game resource that the front end will be able to enable
-            if(auto resource_service = engine().get_service<RAOE::Resource::Service>().lock())
-            {
-                resource_service->emplaced_owned_resource(PongGameTag, std::make_shared<Game>(engine()), RAOE::Framework::Tags::GameType);
-            }
+            if(auto task_service = engine().get_service<RAOE::Service::TaskService>().lock())
+            {   
+                task_service->add_task(init_game(engine()));
+            }           
         }
     };
 

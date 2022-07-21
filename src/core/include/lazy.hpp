@@ -556,7 +556,13 @@ namespace raoe
         }
 
         [[nodiscard]] bool done() const { return m_coro_handle.done(); }
-        void resume() { if(!done()) m_coro_handle(); }
+        void resume() const 
+        { 
+            if(!done()) 
+            { 
+                m_coro_handle(); 
+            }
+        }
 
     private:
         friend lazy_promise_base<T>;

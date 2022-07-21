@@ -14,12 +14,28 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
 
-#include "resource/tag.hpp"
-#include "resource/handle.hpp"
-#include "resource/iresource.hpp"
-#include "resource/type.hpp"
-#include "resource/service.hpp"
+#include "services/task_service.hpp"
 
-#include "resource/awaitable/await_handle.hpp"
+namespace RAOE::Service
+{
+    void TaskService::process_tasks()
+    {
+        for(const raoe::lazy<>& task : m_task_list)
+        {
+            if(!task.done())
+            {
+                task.resume();
+            }
+        }
+
+        //Remove all done tasks
+        m_task_list.remove_if([](const raoe::lazy<>& task){ return task.done(); });
+    }
+
+    void TaskService::add_task(raoe::lazy<>&& task)    
+    {   
+        m_task_list.emplace_back(std::move(task));
+    }
+
+}

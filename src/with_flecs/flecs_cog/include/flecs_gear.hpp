@@ -26,8 +26,8 @@ namespace RAOE::Gears
     {
         FlecsGear(RAOE::Cogs::BaseCog&, std::string_view);
       
-        virtual void activated() override;
-        virtual void deactivated() override;
+        void activated() override;
+        void deactivated() override;
 
         std::unique_ptr<flecs::world> ecs_world_client;
         //std::unique_ptr<flecs::world> ecs_world_server; //TODO: Server World

@@ -73,10 +73,14 @@ namespace RAOE
         {
             services.erase<T>();
         }
+
+        void request_exit() { m_should_shutdown = true; }
+        [[nodiscard]] bool shutdown_requested() const { return m_should_shutdown; }
     private:
         Engine(); //Base Ctor, must be called by one of the protected ctors.  
         
         raoe::container::subclass_map<RAOE::Service::IService> services;
+        bool m_should_shutdown = false;
     };
 
 

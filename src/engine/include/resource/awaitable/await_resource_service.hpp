@@ -13,13 +13,3 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
-#pragma once
-
-#include "resource/tag.hpp"
-#include "resource/handle.hpp"
-#include "resource/iresource.hpp"
-#include "resource/type.hpp"
-#include "resource/service.hpp"
-
-#include "resource/awaitable/await_handle.hpp"

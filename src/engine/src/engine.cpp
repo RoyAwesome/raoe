@@ -21,7 +21,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "console/console.hpp"
 #include "console/command.hpp"
 
-#include "services/tick_service.hpp"
+#include "services/task_service.hpp"
 #include "cogs/cog_service.hpp"
 #include "cogs/gear_service.hpp"
 #include "resource/service.hpp"
@@ -97,10 +97,7 @@ namespace RAOE
         "quit",
         "Exits the game",
         +[](Engine& engine) {
-            if(auto tick_service = engine.get_service<RAOE::Service::TickService>().lock())
-            {
-                tick_service->request_exit();
-            }
+            engine.request_exit();
         }
     );
 
@@ -128,7 +125,7 @@ namespace RAOE
     Engine::Engine(int argv, char** argc)
         : Engine()
     {
-        init_service<RAOE::Service::TickService>();
+        init_service<RAOE::Service::TaskService>();
         init_service<RAOE::Service::GearService>();
         init_service<RAOE::Resource::Service>();        
     }
@@ -181,17 +178,18 @@ namespace RAOE
     }
 
     bool Engine::Run()    
-    {
-        std::shared_ptr<RAOE::Service::TickService> tick_service = get_service<RAOE::Service::TickService>().lock();
-        if(!tick_service)
+    {       
+
+        std::shared_ptr<RAOE::Service::TaskService> task_service = get_service<RAOE::Service::TaskService>().lock();
+        if(!task_service)
         {
-            spdlog::error("Engine::Run() - Unable to tick, cannot find the tick service!");
+            spdlog::error("Engine::Run() - Unable to tick, cannot find the task service!");
             return false;
         }
 
-        tick_service->run_frame();
+        task_service->process_tasks();
 
-        return tick_service->should_exit();
+        return m_should_shutdown;
     }
 
     void Engine::Shutdown()    
