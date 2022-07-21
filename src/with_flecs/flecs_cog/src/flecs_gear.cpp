@@ -69,7 +69,7 @@ namespace RAOE::Gears
 
     raoe::lazy<> tick_ecs(Engine& engine, const std::unique_ptr<flecs::world>& world_ptr)
     {
-        while(!world_ptr)
+        while(world_ptr)
         {
             if(!world_ptr->progress())
             {
