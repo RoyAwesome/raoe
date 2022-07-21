@@ -67,18 +67,9 @@ namespace RAOE::Gears
         spdlog::set_level(spdlog::level::trace);
     }
 
-
-    FlecsGear::FlecsGear(RAOE::Cogs::BaseCog& in_cog, std::string_view name)   
-        : RAOE::Cogs::Gear(in_cog, name)
-        , ecs_world_client(std::make_unique<flecs::world>())
-    {
-        ecs_world_client->set_context(&engine());
-        InitFLECSSystem();    
-    }
-
     raoe::lazy<> tick_ecs(Engine& engine, const std::unique_ptr<flecs::world>& world_ptr)
     {
-        while(!engine.shutdown_requested())
+        while(!world_ptr)
         {
             if(!world_ptr->progress())
             {
@@ -88,23 +79,40 @@ namespace RAOE::Gears
         }
     }
 
-    void FlecsGear::activated()    
+    FlecsGear::FlecsGear(RAOE::Cogs::BaseCog& in_cog, std::string_view name)   
+        : RAOE::Cogs::Gear(in_cog, name)
+        , ecs_world_client(std::make_unique<flecs::world>())
     {
-        if(auto task_service = engine().get_service<RAOE::Service::TaskService>().lock() )
-        {
-            task_service->add_task(tick_ecs(engine(), ecs_world_client));
-        }       
-      
+        ecs_world_client->set_context(&engine());
+        InitFLECSSystem();      
+    }  
 
+    void FlecsGear::activated()    
+    {        
         if(ecs_world_client)
         {
             ecs_world_client->import<RAOE::ECS::ClientApp::Module>();
-        }    
+        }   
+        RAOE::enqueue_task(engine(), tick_ecs(engine(), ecs_world_client));
     }
 
     void FlecsGear::deactivated()    
     {
     
+    }
+
+    const std::unique_ptr<flecs::world>& client_world(RAOE::Engine& engine)    
+    {
+        if(auto gear_service = engine.get_service<RAOE::Service::GearService>().lock())
+        {
+            if(auto flecs_gear = gear_service->get_gear<FlecsGear>().lock())
+            {
+                return flecs_gear->ecs_world_client;
+            }
+        }        
+
+        static std::unique_ptr<flecs::world> none_world;
+        return none_world;    
     }    
 }
 

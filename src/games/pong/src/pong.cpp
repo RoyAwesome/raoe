@@ -22,9 +22,31 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "lazy.hpp"
 #include "services/task_service.hpp"
 
+#include "flecs.h"
+#include "components/game_components.hpp"
+
 namespace RAOE::Pong
 {
     const RAOE::Resource::Tag PongGameTag = RAOE::Resource::Tag("pong:game");
+    struct Game;
+    raoe::lazy<> initalize_pong(RAOE::Engine& engine, Game* game);
+
+    struct Module
+    {
+        Module(flecs::world& world)
+        {
+            paddle_prefab = world.prefab()
+                .add<RAOE::Framework::transform2d>();
+
+            ball_prefab = world.prefab()
+                .add<RAOE::Framework::transform2d>();
+            
+        }
+
+        flecs::entity paddle_prefab;
+        flecs::entity ball_prefab;
+        flecs::entity score_prefab;
+    };
 
     struct Game : RAOE::Framework::IGame
     {
@@ -38,6 +60,11 @@ namespace RAOE::Pong
             
         }
     };
+
+    raoe::lazy<> initalize_pong(RAOE::Engine& engine, Game* game)
+    {
+         
+    }
 
     struct Gear : RAOE::Cogs::Gear
     {

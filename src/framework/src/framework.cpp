@@ -15,11 +15,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 */
 
 #include "framework.hpp"
+#include "game_components_private.hpp"
 #include "engine.hpp"
 #include "cogs/cog.hpp"
 #include "cogs/gear.hpp"
 #include "cogs/gear_service.hpp"
 #include "resource/resources.hpp"
+#include "console/command.hpp"
+
+#include "flecs_gear.hpp"
 
 namespace RAOE::Gears
 {
@@ -33,6 +37,12 @@ namespace RAOE::Gears
 
         void activated() override
         {
+            const auto& client_world = RAOE::Gears::client_world(engine());
+
+            if(client_world)
+            {
+                client_world->import<RAOE::Framework::Module>();
+            }
         }
 
         std::shared_ptr<RAOE::Resource::Handle> m_active_game;
@@ -65,6 +75,7 @@ namespace RAOE::Framework
 
                 //Enqueue the startup tasks
                 task_service->enqueue_startup_tasks(*game);
+                //TODO: await these tasks
             }    
 
             //make the game active
@@ -73,6 +84,7 @@ namespace RAOE::Framework
                 if(auto framework_gear = gear_service->get_gear<RAOE::Gears::FrameworkGear>().lock())
                 {
                     framework_gear->m_active_game = game_handle;
+                    spdlog::info("Transitioned to game {}", game_handle->tag());
                 }
             }   
         }      
@@ -96,7 +108,7 @@ namespace RAOE::Framework
                             task_service->enqueue_shutdown_tasks(*game);
                             //TODO: Await all these shutdown tasks
                         }   
-
+                        spdlog::info("Shut down game {}", framework_gear->m_active_game->tag());
                         framework_gear->m_active_game.reset();                    
                     }
                 }
@@ -130,6 +142,15 @@ namespace RAOE::Framework
 
         return {};
     }
+
+    using AutoRegisterConsoleCommand = RAOE::Console::AutoRegisterConsoleCommand;
+    static const AutoRegisterConsoleCommand quit_command = RAOE::Console::CreateConsoleCommand(
+        "close_current_game",
+        "closes the current game",
+        +[](Engine& engine) {
+            enqueue_task(engine, deactivate_game(engine));
+        }
+    );
 }
 
 

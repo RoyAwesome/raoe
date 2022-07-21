@@ -14,24 +14,15 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    limitations under the License.
 */
 
-#pragma once
-#include "cogs/gear.hpp"
+#include "components/game_components.hpp"
+#include "game_components_private.hpp"
+
 #include "flecs.h"
-#include <string>
 
-namespace RAOE::Gears
+namespace RAOE::Framework
 {
-    extern const std::string FlecsGearName;
-    struct FlecsGear : public RAOE::Cogs::Gear
+    Module::Module(flecs::world& world)    
     {
-        FlecsGear(RAOE::Cogs::BaseCog&, std::string_view);
-      
-        void activated() override;
-        void deactivated() override;
-
-        std::unique_ptr<flecs::world> ecs_world_client;
-        //std::unique_ptr<flecs::world> ecs_world_server; //TODO: Server World
-    };
-
-    const std::unique_ptr<flecs::world>& client_world(RAOE::Engine& engine);
+        world.component<transform2d>();
+    }
 }
