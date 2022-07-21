@@ -22,6 +22,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "imgui.h"
 #include "frontend_internal.hpp"
 #include "framework.hpp"
+#include "services/task_service.hpp"
 
 namespace RAOE::Frontend
 {
@@ -30,38 +31,40 @@ namespace RAOE::Frontend
     void draw_frontend(flecs::entity e, FrontenedPanel& panel)
     {
         RAOE::Engine& engine = *static_cast<RAOE::Engine*>(e.world().get_context());
-
-        ImGui::Begin("Frontend");
-        {
-            ImGui::Text("This is a temporary Frontend.  I will eventually make this feel like a game console, switching out cartridges.");
-            ImGui::Text("But for now, it's just a simple list of games");
-            ImGui::Separator();
-
-            ImGui::Text("Games: ");
-            if(auto resource_service = engine.get_service<RAOE::Resource::Service>().lock())
+        if(!RAOE::Framework::has_active_game(engine))
+        {       
+            ImGui::Begin("Frontend");
             {
-                for(const auto& [tag, handle] : resource_service->handle_map())
+                ImGui::Text("This is a temporary Frontend.  I will eventually make this feel like a game console, switching out cartridges.");
+                ImGui::Text("But for now, it's just a simple list of games");
+                ImGui::Separator();
+
+                ImGui::Text("Games: ");
+                if(auto resource_service = engine.get_service<RAOE::Resource::Service>().lock())
                 {
-                    if(auto locked_handle = handle.lock())
+                    for(const auto& [tag, handle] : resource_service->handle_map())
                     {
-                        if(locked_handle->resource_type() == RAOE::Framework::Tags::GameType)
-                        {                            
-                            ImGui::Text("%s", std::string(tag).c_str());
-                            ImGui::SameLine();
-                            if(ImGui::Button("Start Game"))
-                            {
-                                //Transition to the game
-                            }                        
+                        if(auto locked_handle = handle.lock())
+                        {
+                            if(locked_handle->resource_type() == RAOE::Framework::Tags::GameType)
+                            {                            
+                                ImGui::Text("%s", std::string(tag).c_str());
+                                ImGui::SameLine();
+                                if(ImGui::Button("Start Game"))
+                                {
+                                    //Transition to the game
+                                    RAOE::enqueue_task(engine, RAOE::Framework::make_active_game(engine, locked_handle));
+                                }                        
+                            }
                         }
                     }
                 }
-            }
-           
             
+                
+            }
+            ImGui::End();
         }
-        ImGui::End();
     }
-
 
     Module::Module(flecs::world& world)
     {

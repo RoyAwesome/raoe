@@ -51,7 +51,7 @@ namespace RAOE::Resource
 
         std::shared_ptr<Handle> load_resource(const Tag& tag);
         std::shared_ptr<Handle> emplace_resource(const Tag& tag, const std::weak_ptr<IResource>& resource, const Tag& resource_type);
-        std::shared_ptr<Handle> emplaced_owned_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type)  ;
+        std::shared_ptr<Handle> emplaced_owned_resource(const Tag& tag, const std::shared_ptr<IResource>& resource, const Tag& resource_type);
 
         //inits a resource, or returns it if the resource exists
         std::weak_ptr<Handle> init_resource_type(const Tag& tag);

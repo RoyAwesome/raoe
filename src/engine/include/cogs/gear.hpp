@@ -20,6 +20,9 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "cogs/cog.hpp"
 #include "resource/iresource.hpp"
 #include "resource/tag.hpp"
+#include "lazy.hpp"
+#include "services/task_service.hpp"
+#include <list>
 
 namespace RAOE
 {
@@ -28,11 +31,16 @@ namespace RAOE
 
 namespace RAOE::Cogs
 {  
-    class Gear : public RAOE::Resource::IResource
+    class Gear : public RAOE::Resource::IResource, public RAOE::Service::task_provider
     {
+    public:
         Gear() = delete; //use the engine ctor
         Gear(const Gear&) = delete; //cant copy gears
+        Gear& operator=(const Gear&) = delete;
         Gear(Gear&&) = delete; //can't move gears
+        Gear& operator=(Gear&&) = delete;
+
+        virtual ~Gear() = default; //NOLINT
     protected:
         Gear(RAOE::Cogs::BaseCog& in_cog, std::string_view name)
             : m_cog(in_cog)
@@ -45,14 +53,15 @@ namespace RAOE::Cogs
         virtual void activated() {}
         virtual void deactivated() {}
 
-        RAOE::Engine& engine() const { return m_cog.engine(); }
-        const RAOE::Cogs::BaseCog& cog() const { return m_cog; }
+        [[nodiscard]] RAOE::Engine& engine() const { return m_cog.engine(); }
+        [[nodiscard]] const RAOE::Cogs::BaseCog& cog() const { return m_cog; }
 
         //BEGIN: IResource Interface
-        virtual RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
+        [[nodiscard]] RAOE::Resource::IResource::ELoadStatus loadstatus() const override { return RAOE::Resource::IResource::ELoadStatus::Loaded; }
         //END: IResource Interface
         
-        const RAOE::Resource::Tag& tag() const { return m_tag; }
+        [[nodiscard]] const RAOE::Resource::Tag& tag() const { return m_tag; }
+
     private:
         RAOE::Cogs::BaseCog& m_cog;
         RAOE::Resource::Tag m_tag;

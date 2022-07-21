@@ -67,6 +67,10 @@ namespace RAOE
                 {
                     if(gear_ptr && &gear_ptr->cog() == &for_cog)
                     {
+                        if(auto task_service = for_cog.engine().get_service<RAOE::Service::TaskService>().lock())
+                        {
+                            task_service->enqueue_startup_tasks(*gear_ptr.get());
+                        }
                         gear_ptr->activated();
                     }
                 } 
@@ -207,4 +211,6 @@ namespace RAOE
             return;
         }
     }
+
+ 
 }

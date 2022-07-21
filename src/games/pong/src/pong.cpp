@@ -31,7 +31,6 @@ namespace RAOE::Pong
         Game(RAOE::Engine& in_engine)
             : RAOE::Framework::IGame(in_engine)
         {
-
         }
 
         void begin() override
@@ -40,30 +39,17 @@ namespace RAOE::Pong
         }
     };
 
-    raoe::lazy<> init_game(RAOE::Engine& engine)
-    {
-        if(auto resource_service = engine.get_service<RAOE::Resource::Service>().lock())
-        {
-            auto game_handle = resource_service->get_resource(RAOE::Framework::Tags::GameType);        
-            co_await RAOE::Resource::handle_loaded(game_handle);
-
-            resource_service->emplaced_owned_resource(PongGameTag, std::make_shared<Game>(engine), RAOE::Framework::Tags::GameType);
-        }
-    }
-
-
     struct Gear : RAOE::Cogs::Gear
     {
         Gear(RAOE::Cogs::BaseCog& in_cog, std::string_view in_name)
             : RAOE::Cogs::Gear(in_cog, in_name) 
-        {}
+        {
+            startup_task(RAOE::Resource::emplace_owned_resource<Game>(engine(), PongGameTag, RAOE::Framework::Tags::GameType));
+        }
 
         void activated() override
         {
-            if(auto task_service = engine().get_service<RAOE::Service::TaskService>().lock())
-            {   
-                task_service->add_task(init_game(engine()));
-            }           
+          
         }
     };
 

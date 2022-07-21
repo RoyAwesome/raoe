@@ -20,8 +20,27 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "services/iservice.hpp"
 #include "lazy.hpp"
 
+namespace RAOE
+{
+    void enqueue_task(RAOE::Engine& engine, raoe::lazy<>&& task);
+}
+
 namespace RAOE::Service
 {
+    class TaskService;
+
+    class task_provider
+    {
+    public:
+        friend class RAOE::Service::TaskService;
+
+        void startup_task(raoe::lazy<>&& task) { m_startup_tasks.emplace_back(std::move(task)); }
+        void shutdown_task(raoe::lazy<>&& task) { m_shutdown_tasks.emplace_back(std::move(task)); }
+    private:
+        std::list<raoe::lazy<>> m_startup_tasks;
+        std::list<raoe::lazy<>> m_shutdown_tasks;    
+    };
+
     class TaskService : public IService
     {
     public:
@@ -32,6 +51,18 @@ namespace RAOE::Service
 
         void process_tasks();
         void add_task(raoe::lazy<>&& task);
+        
+        void enqueue_startup_tasks(task_provider& provider)
+        {
+            append_tasks(provider.m_startup_tasks);
+        }
+
+        void enqueue_shutdown_tasks(task_provider& provider)
+        {
+            append_tasks(provider.m_shutdown_tasks);
+        }    
+
+        void append_tasks(std::list<raoe::lazy<>>& in_list);
     private:
         std::list<raoe::lazy<>> m_task_list;
     };

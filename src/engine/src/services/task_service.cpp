@@ -16,6 +16,7 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 
 
 #include "services/task_service.hpp"
+#include "engine.hpp"
 
 namespace RAOE::Service
 {
@@ -38,4 +39,21 @@ namespace RAOE::Service
         m_task_list.emplace_back(std::move(task));
     }
 
+    void TaskService::append_tasks(std::list<raoe::lazy<>>& in_list)    
+    {
+        for(raoe::lazy<>& task : in_list)
+        {
+            add_task(std::move(task));
+        }       
+        in_list.clear();    
+    }
+
+}
+
+void RAOE::enqueue_task(RAOE::Engine& engine, raoe::lazy<>&& task)
+{
+    if(auto task_service = engine.get_service<RAOE::Service::TaskService>().lock())
+    {
+        task_service->add_task(std::move(task));
+    }
 }

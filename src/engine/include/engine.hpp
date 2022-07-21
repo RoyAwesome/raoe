@@ -27,10 +27,6 @@ int main(int, char**);
 
 namespace RAOE
 {
-    class Engine;
-
-
-
     class Engine
     {     
     public:     
@@ -81,7 +77,5 @@ namespace RAOE
         
         raoe::container::subclass_map<RAOE::Service::IService> services;
         bool m_should_shutdown = false;
-    };
-
-
+    };   
 }

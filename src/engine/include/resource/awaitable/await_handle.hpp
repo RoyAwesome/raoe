@@ -13,13 +13,14 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#pragma once
 
 #include "resource/handle.hpp"
 #include <coroutine>
 
 namespace RAOE::Resource
 {
-    inline auto handle_loaded(std::shared_ptr<RAOE::Resource::Handle> in_handle)
+    inline auto is_handle_loaded(std::shared_ptr<RAOE::Resource::Handle> in_handle)
     {
          struct awaiter
             {
@@ -27,14 +28,14 @@ namespace RAOE::Resource
                     : m_handle(std::move(in_handle))
                 {}
 
-                bool await_ready() const noexcept
+                [[nodiscard]] bool await_ready() const noexcept
                 {
                     return m_handle->loaded();
                 }
 
                 bool await_suspend(std::coroutine_handle<> awaiting_coro) noexcept
                 {
-                    return m_handle->loaded();
+                    return !m_handle->loaded();
                 }
 
                 void await_resume() noexcept {}

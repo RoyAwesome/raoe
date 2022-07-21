@@ -23,3 +23,4 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #include "resource/service.hpp"
 
 #include "resource/awaitable/await_handle.hpp"
+#include "resource/awaitable/await_resource_service.hpp"

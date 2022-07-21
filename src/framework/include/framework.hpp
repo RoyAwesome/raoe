@@ -17,6 +17,8 @@ Copyright 2022 Roy Awesome's Open Engine (RAOE)
 #pragma once
 
 #include "resource/iresource.hpp"
+#include "services/task_service.hpp"
+#include "lazy.hpp"
 
 namespace RAOE
 {
@@ -35,9 +37,13 @@ namespace RAOE::Framework
         extern const RAOE::Resource::Tag GameType;
     }
 
+    raoe::lazy<> make_active_game(RAOE::Engine& engine, std::shared_ptr<RAOE::Resource::Handle> game_handle);
+    raoe::lazy<> deactivate_game(RAOE::Engine& engine);
+
+    
     
 
-    class IGame : public RAOE::Resource::IResource
+    class IGame : public RAOE::Resource::IResource, public RAOE::Service::task_provider
     {
     public:
         explicit IGame(RAOE::Engine& in_engine)
@@ -48,9 +54,17 @@ namespace RAOE::Framework
         [[nodiscard]] ELoadStatus loadstatus() const override { return ELoadStatus::Loaded; }   
 
         virtual void begin() = 0;
+        virtual void end() {};
 
-        [[nodiscard]] const RAOE::Engine& engine() const { return m_engine; }
+        [[nodiscard]] const RAOE::Engine& engine() const { return m_engine; }       
     private:
         RAOE::Engine& m_engine;
     };
+
+    
+    bool has_active_game(RAOE::Engine& engine);
+    std::shared_ptr<IGame> get_active_game(RAOE::Engine& engine);
+
+
+
 }
