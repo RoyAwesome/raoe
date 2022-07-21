@@ -46,3 +46,15 @@ TEST(lazy, SumCoro)
 {
     EXPECT_EQ(sum(42).sync_await(), 42 * 43 / 2);
 }
+
+raoe::lazy<void> basic_handle_test(int value)
+{
+    int s = co_await sum(value);
+
+    spdlog::info("Sum: {} ", s);
+}
+
+TEST(lazy, basic_coro)
+{
+    EXPECT_NO_THROW(basic_handle_test(42).sync_await());
+}

@@ -430,7 +430,7 @@ namespace raoe
             {
                 if(m_exception)
                 {
-                    std::destroy_at(std::addressof(m_exception))
+                    std::destroy_at(std::addressof(m_exception));
                 }
             }
 
@@ -486,8 +486,8 @@ namespace raoe
 
                 [[nodiscard]] std::coroutine_handle<lazy_promise_base> await_suspend(std::coroutine_handle<> coro) noexcept
                 {
-                    coro.promise().m_coro_handle = m_coro_handle;
-                    return coro;
+                    m_coro_handle.promise().m_coro_handle = coro;
+                    return m_coro_handle;
                 }
 
                 T await_resume() 
@@ -495,7 +495,7 @@ namespace raoe
                     auto& promise = m_coro_handle.promise();
                     if(promise.m_exception)
                     {
-                        std::rethrow_exception(std::move(primise.m_exception));
+                        std::rethrow_exception(std::move(promise.m_exception));
                     }
                 }
             };
@@ -506,7 +506,7 @@ namespace raoe
     }
 
     template<class T, class Allocator>
-    class [[nodiscard]] lazy //NOLINT
+    class [[nodiscard]] lazy
     {
     public:
         static_assert(std::is_void_v<T> || std::is_reference_v<T> || std::is_object_v<T> && std::is_move_constructible_v<T>,
@@ -523,6 +523,12 @@ namespace raoe
         lazy(lazy&& other) noexcept 
             : m_coro_handle(std::exchange(other.m_coro_handle, {}))
             { }
+        
+        lazy& operator=(lazy&& other) noexcept
+        {
+            m_coro_handle = std::exchange(other.m_coro_handle, {});
+        }
+        
         ~lazy()
         {
             if(m_coro_handle)
@@ -530,10 +536,12 @@ namespace raoe
                 m_coro_handle.destroy();
             }
         }
+        lazy(const lazy&) = delete; //Lazy cannot be copied, only moved
+        lazy& operator=(const lazy&) = delete;
+        
 
         [[nodiscard]] typename lazy_promise_base<T>::Awaiter operator co_await()
-        {
-            
+        {            
             auto& promise_base = static_cast<lazy_promise_base<T>&>(m_coro_handle.promise());
             return typename lazy_promise_base<T>::Awaiter{ std::coroutine_handle<lazy_promise_base<T>>::from_promise(promise_base) };
         }
@@ -547,6 +555,9 @@ namespace raoe
             return simple.await_resume();
         }
 
+        [[nodiscard]] bool done() const { return m_coro_handle.done(); }
+        void resume() { if(!done()) m_coro_handle(); }
+
     private:
         friend lazy_promise_base<T>;
         explicit lazy(std::coroutine_handle<promise_type> in_coro_handle) noexcept : m_coro_handle(in_coro_handle) {}
@@ -554,4 +565,5 @@ namespace raoe
 
         std::coroutine_handle<promise_type> m_coro_handle = nullptr;
     };
+    
 }
